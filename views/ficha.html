@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloraGirardot - Acacia roja</title>
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos y Script de Leaflet.js para el Mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+
+<!-- Header Superior -->
+<header class="main-header">
+    <div class="header-container">
+        <div class="logo-group">
+            <img src="../public/assets/img/logo-floragirardot.svg" alt="Isotipo FloraGirardot" class="logo-icon">
+            <span class="logo-title">FloraGirardot</span>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">Inicio</a>
+            <a href="catalogo.html" class="nav-link active">Catálogo</a>
+            <a href="#acerca" class="nav-link">Acerca de</a>
+            <a href="catalogo.html" class="btn-buscar">Buscar</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Layout Principal de la Ficha Técnica -->
+<main class="sheet-container">
+
+    <!-- Barra de Navegación Secundaria / Breadcrumbs -->
+    <div class="breadcrumb-bar">
+        <a href="catalogo.html" class="btn-return">Volver al catálogo</a>
+        <div class="species-title-badge">Acacia roja - Delonix regia</div>
+    </div>
+
+    <!-- Bloque Superior: Galería y Datos Rápidos -->
+    <section class="sheet-main-info">
+
+        <!-- Columna Izquierda: Imagen Principal -->
+        <div class="species-image-box">
+            <img src="../public/assets/img/acacia-roja-hero.svg" alt="Acacia roja en Girardot">
+        </div>
+
+        <!-- Columna Derecha: Tarjetas Taxonómicas -->
+        <div class="species-details-box">
+            <div class="section-badge-header">Ficha Técnica</div>
+
+            <div class="taxonomy-list-card">
+                <p><strong>Nombre común:</strong> Acacia roja, acacio rojo, acacia de Girardot, flamboyán.</p>
+                <p><strong>Nombre científico:</strong> <em>Delonix regia</em>.</p>
+                <p><strong>Familia:</strong> Fabaceae.</p>
+                <p><strong>Origen:</strong> Madagascar (Introducida).</p>
+                <p><strong>Tipo de planta:</strong> Árbol ornamental.</p>
+                <p><strong>Rango altitudinal:</strong> 0 – 1200 m s. n. m.</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- Bloque Inferior 1: Descripción Botánica -->
+    <section class="info-block-card">
+        <h2>DESCRIPCIÓN BOTÁNICA</h2>
+        <p>
+            Árbol de copa amplia y visualmente distintiva que puede alcanzar aproximadamente 15 metros de altura. Presenta tronco grueso con corteza gris y hojas compuestas bipinnadas. Sus flores rojas o rojo-anaranjadas constituyen su principal elemento visual. El fruto es una vaina alargada de color oscuro con numerosas semillas.
+        </p>
+    </section>
+
+    <!-- Bloque Inferior 2: Distribución e Importancia Local -->
+    <section class="info-block-card">
+        <h2>IMPORTANCIA PARA GIRARDOT Y DISTRIBUCIÓN</h2>
+        <p>
+            La especie posee un valor particular dentro de la identidad y el paisaje urbano de Girardot, siendo identificada históricamente como la "Acacia de Girardot". Se encuentra asociada a condiciones de Bosque Seco Tropical dentro del casco urbano y zonas de ribera del Alto Magdalena.
+        </p>
+    </section>
+
+    <!-- Bloque Inferior 3: Mapa Interactivo de Ubicación (Leaflet) -->
+    <section class="info-block-card">
+        <h2>REGISTRO DE UBICACIÓN EN GIRARDOT</h2>
+        <p class="map-subtitle">Puntos georreferenciados de presencia de <em>Delonix regia</em> en el municipio:</p>
+        <div id="mapa-girardot" class="leaflet-map-box"></div>
+    </section>
+
+</main>
+
+<!-- Script para Inicializar el Mapa de Leaflet -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // 1. Centrar mapa en Girardot (Lat, Lng, Zoom)
+        const map = L.map('mapa-girardot').setView([4.3023, -74.8061], 14);
+
+        // 2. Capa gratuita OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        // 3. Puntos de presencia de Acacia Roja registrados en la DB
+        const puntosAcacia = [
+            { nombre: "Parque Bolívar - Girardot", lat: 4.3045, lng: -74.8055 },
+            { nombre: "Avenida del Ferrocarril", lat: 4.3010, lng: -74.8080 },
+            { nombre: "Malecón Río Magdalena", lat: 4.2985, lng: -74.8120 }
+        ];
+
+        // 4. Agregar marcadores al mapa
+        puntosAcacia.forEach(punto => {
+            L.marker([punto.lat, punto.lng])
+                .addTo(map)
+                .bindPopup(`<b>Acacia roja</b><br>${punto.nombre}`);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,661 @@
+/* Variables Globales */
+:root {
+    --bg-color: #F0F0ED;             /* Blanco Hueso / Fondo suave */
+    --header-bg: #EAEAEA;           /* Gris claro cabecera */
+    --text-dark: #1E3A2B;            /* Verde Bosque para textos */
+    --btn-green: #2E5A44;            /* Verde Oliva para el botón Buscar */
+
+    /* Colores de la referencia borrador */
+    --girardot-red: #D91017;
+    --girardot-blue: #0073CF;
+    --girardot-green: #008736;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.main-header {
+    background-color: var(--header-bg);
+    padding: 12px 40px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    height: 42px;
+    width: auto;
+}
+
+.logo-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: #1A1A1A;
+}
+
+.nav-menu {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: #1A1A1A;
+    font-weight: 500;
+    font-size: 15px;
+}
+
+.nav-link.active {
+    font-weight: 700;
+}
+
+.btn-buscar {
+    background-color: var(--btn-green);
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Hero Section */
+.hero-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 60px 40px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.subtitle {
+    font-size: 38px;
+    color: var(--text-dark);
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+
+/* Estilos de la palabra GIRARDOT */
+.city-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 85px;
+    font-weight: 800;
+    letter-spacing: -1px;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+
+.text-red { color: var(--girardot-red); }
+.text-green { color: var(--girardot-green); }
+
+.badge-blue {
+    background-color: var(--girardot-blue);
+    color: #FFFFFF;
+    padding: 0 16px;
+    border-radius: 18px;
+    margin: 0 4px;
+    display: inline-block;
+}
+
+/* Imagen Hero con bordes redondeados */
+.hero-image-side {
+    width: 480px;
+    height: 380px;
+}
+
+.hero-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 24px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS VISTA CATÁLOGO
+   ========================================== */
+
+.catalog-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    width: 100%;
+}
+
+/* Área de Título y Buscador */
+.catalog-header-area {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin-bottom: 30px;
+}
+
+.catalog-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 38px;
+    font-weight: 800;
+    color: #1E3A2B;
+    min-width: 180px;
+}
+
+.search-bar-container {
+    flex: 1;
+}
+
+.search-input {
+    width: 100%;
+    background-color: #DCDCDC;
+    border: none;
+    padding: 14px 24px;
+    border-radius: 20px;
+    font-size: 15px;
+    color: #333333;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: #555555;
+}
+
+/* Estructura de 2 Columnas */
+.catalog-body {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Sidebar Filtros */
+.filters-sidebar {
+    background-color: #DCDCDC;
+    border-radius: 20px;
+    padding: 24px;
+}
+
+.filters-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin-bottom: 24px;
+}
+
+.filter-group {
+    margin-bottom: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.group-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1A1A1A;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+/* Checkbox Personalizado tipo Píldora redondeada */
+.custom-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 15px;
+    color: #1A1A1A;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-checkbox input {
+    display: none;
+}
+
+.checkmark {
+    width: 24px;
+    height: 14px;
+    background-color: #AFAFAF;
+    border-radius: 10px;
+    display: inline-block;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.custom-checkbox input:checked ~ .checkmark {
+    background-color: #008736; /* Verde activo */
+}
+
+/* Grilla de Tarjetas */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+/* Tarjeta Horizontal Verde */
+.species-card-horizontal {
+    background-color: #10B950; /* Verde brillante esmeralda del prototipo */
+    border-radius: 24px;
+    display: flex;
+    height: 180px;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+.card-img-wrapper {
+    width: 45%;
+    height: 100%;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+}
+
+.card-info-wrapper {
+    width: 55%;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: #FFFFFF;
+}
+
+.card-text-content h3 {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 2px;
+}
+
+.card-text-content .scientific-name {
+    font-size: 14px;
+    font-style: italic;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+.card-text-content .family-name {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.btn-card-white {
+    background-color: #FFFFFF;
+    color: #10B950;
+    text-decoration: none;
+    text-align: center;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 14px;
+    width: max-content;
+    align-self: flex-start;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ==========================================
+   ESTILOS ESPECÍFICOS VISTA FICHA TÉCNICA
+   ========================================== */
+
+.sheet-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Breadcrumb Bar */
+.breadcrumb-bar {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.btn-return {
+    background-color: #10B950; /* Verde esmeralda */
+    color: #FFFFFF;
+    text-decoration: none;
+    padding: 10px 22px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.species-title-badge {
+    background-color: #DCDCDC;
+    color: #1A1A1A;
+    padding: 10px 24px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    flex: 1;
+}
+
+/* Disposición Superior (2 Columnas) */
+.sheet-main-info {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: 24px;
+    align-items: stretch;
+}
+
+.species-image-box {
+    width: 100%;
+    height: 100%;
+    min-height: 280px;
+}
+
+.species-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+}
+
+.species-details-box {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.section-badge-header {
+    background-color: #DCDCDC;
+    color: #1A1A1A;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 15px;
+    width: max-content;
+}
+
+.taxonomy-list-card {
+    background-color: #DCDCDC;
+    border-radius: 20px;
+    padding: 24px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+}
+
+.taxonomy-list-card p {
+    font-size: 15px;
+    color: #1A1A1A;
+    line-height: 1.4;
+}
+
+/* Bloques Grises de Información Inferior */
+.info-block-card {
+    background-color: #DCDCDC;
+    border-radius: 20px;
+    padding: 24px 28px;
+}
+
+.info-block-card h2 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+}
+
+.info-block-card p {
+    font-size: 15px;
+    color: #1A1A1A;
+    line-height: 1.6;
+}
+
+.map-subtitle {
+    margin-bottom: 14px;
+    color: #444444;
+}
+
+/* Contenedor del Mapa */
+.leaflet-map-box {
+    height: 320px;
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* ==========================================
+   ESTILOS VISTA PARTICIPACIÓN COMUNITARIA
+   ========================================== */
+
+.participation-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Columna Izquierda: Reportes */
+.participation-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 32px;
+    font-weight: 800;
+    color: #1E3A2B;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.reports-box {
+    background-color: #DCDCDC;
+    border-radius: 20px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.reports-header-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1A1A1A;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.report-card {
+    background-color: #10B950;
+    border-radius: 20px;
+    display: flex;
+    height: 120px;
+    overflow: hidden;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+}
+
+.report-img-wrapper {
+    width: 45%;
+    height: 100%;
+}
+
+.report-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
+}
+
+.report-info-wrapper {
+    width: 55%;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.placeholder-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.line {
+    height: 12px;
+    background-color: #FFFFFF;
+    border-radius: 6px;
+    display: block;
+}
+
+.line-long { width: 90%; }
+.line-medium { width: 65%; }
+
+.btn-report-white {
+    background-color: #FFFFFF;
+    color: #10B950;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    width: max-content;
+}
+
+/* Columna Derecha: Formulario */
+.form-container-card {
+    background-color: #DCDCDC;
+    border-radius: 20px;
+    padding: 24px 30px;
+}
+
+.form-header-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1A1A1A;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+.contribution-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-grid-top {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+}
+
+.form-fields-left {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-input {
+    width: 100%;
+    background-color: #FFFFFF;
+    border: none;
+    border-radius: 20px;
+    padding: 14px 20px;
+    font-size: 15px;
+    outline: none;
+    color: #333333;
+}
+
+.form-textarea {
+    width: 100%;
+    height: 160px;
+    background-color: #FFFFFF;
+    border: none;
+    border-radius: 20px;
+    padding: 16px 20px;
+    font-size: 15px;
+    outline: none;
+    resize: none;
+    color: #333333;
+}
+
+/* Caja de carga de imagen */
+.upload-image-box {
+    background-color: #FFFFFF;
+    border-radius: 20px;
+    height: 100%;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.upload-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.upload-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.file-input-hidden {
+    display: none;
+}
+
+/* Botón Enviar */
+.form-submit-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.btn-submit-green {
+    background-color: #10B950;
+    color: #FFFFFF;
+    border: none;
+    padding: 12px 48px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}

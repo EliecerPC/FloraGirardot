@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloraGirardot - Catálogo</title>
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Header Superior -->
+<header class="main-header">
+    <div class="header-container">
+        <div class="logo-group">
+            <img src="../public/assets/img/logo-floragirardot.svg" alt="Isotipo FloraGirardot" class="logo-icon">
+            <span class="logo-title">FloraGirardot</span>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">Inicio</a>
+            <a href="catalogo.html" class="nav-link active">Catálogo</a>
+            <a href="participacion.html" class="nav-link">Participación</a>
+            <a href="#acerca" class="nav-link">Acerca de</a>
+            <a href="catalogo.html" class="btn-buscar">Buscar</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Contenido Principal del Catálogo -->
+<main class="catalog-layout">
+
+    <!-- Encabezado y Buscador -->
+    <div class="catalog-header-area">
+        <h1 class="catalog-title">Catálogo</h1>
+        <div class="search-bar-container">
+            <input type="text" placeholder="Buscar por nombre común, científico (ej. Delonix, Guayacán)" class="search-input">
+        </div>
+    </div>
+
+    <!-- Layout en 2 Columnas -->
+    <div class="catalog-body">
+
+        <!-- Columna Izquierda: Filtros -->
+        <aside class="filters-sidebar">
+            <h2 class="filters-title">Filtros de búsqueda</h2>
+
+            <!-- Grupo: Tipo de Planta -->
+            <div class="filter-group">
+                <span class="group-label">TIPO DE PLANTA</span>
+                <label class="custom-checkbox">
+                    <input type="checkbox" checked>
+                    <span class="checkmark"></span>
+                    Árboles
+                </label>
+                <label class="custom-checkbox">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Arbustis
+                </label>
+                <label class="custom-checkbox">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Florales
+                </label>
+            </div>
+
+            <!-- Grupo: Origen -->
+            <div class="filter-group">
+                <span class="group-label">ORIGEN</span>
+                <label class="custom-checkbox">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Nativa
+                </label>
+                <label class="custom-checkbox">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Introducida
+                </label>
+            </div>
+
+            <!-- Grupo: Hábitat -->
+            <div class="filter-group">
+                <span class="group-label">HÁBITAT</span>
+                <label class="custom-checkbox">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Ribera del Río
+                </label>
+                <label class="custom-checkbox">
+                    <input type="checkbox">
+                    <span class="checkmark"></span>
+                    Bosque Seco
+                </label>
+            </div>
+        </aside>
+
+        <!-- Columna Derecha: Grilla de Tarjetas -->
+        <section class="cards-grid">
+
+            <!-- Tarjeta 1: Acacia Roja -->
+            <article class="species-card-horizontal">
+                <div class="card-img-wrapper">
+                    <img src="../public/assets/img/acacia-roja-hero.svg" alt="Acacia Roja">
+                </div>
+                <div class="card-info-wrapper">
+                    <div class="card-text-content">
+                        <h3>Acacia Roja</h3>
+                        <p class="scientific-name">Delonix regia</p>
+                        <p class="family-name">Fabaceae</p>
+                    </div>
+                    <a href="ficha.html?id=1" class="btn-card-white">Ver Ficha</a>
+                </div>
+            </article>
+
+            <!-- Tarjeta 2 -->
+            <article class="species-card-horizontal">
+                <div class="card-img-wrapper">
+                    <img src="../public/assets/img/acacia-roja-hero.svg" alt="Especie 2">
+                </div>
+                <div class="card-info-wrapper">
+                    <div class="card-text-content">
+                        <h3>Guayacán</h3>
+                        <p class="scientific-name">Handroanthus sp.</p>
+                        <p class="family-name">Bignoniaceae</p>
+                    </div>
+                    <a href="#" class="btn-card-white">Ver Ficha</a>
+                </div>
+            </article>
+
+            <!-- Tarjeta 3 -->
+            <article class="species-card-horizontal">
+                <div class="card-img-wrapper">
+                    <img src="../public/assets/img/acacia-roja-hero.svg" alt="Especie 3">
+                </div>
+                <div class="card-info-wrapper">
+                    <div class="card-text-content">
+                        <h3>Guayacán Amarillo</h3>
+                        <p class="scientific-name">Handroanthus chrysanthus</p>
+                        <p class="family-name">Bignoniaceae</p>
+                    </div>
+                    <a href="#" class="btn-card-white">Ver Ficha</a>
+                </div>
+            </article>
+
+            <!-- Tarjeta 4 -->
+            <article class="species-card-horizontal">
+                <div class="card-img-wrapper">
+                    <img src="../public/assets/img/acacia-roja-hero.svg" alt="Especie 4">
+                </div>
+                <div class="card-info-wrapper">
+                    <div class="card-text-content">
+                        <h3>Arbolado Urbano</h3>
+                        <p class="scientific-name">Especie registrada</p>
+                        <p class="family-name">Familia</p>
+                    </div>
+                    <a href="#" class="btn-card-white">Ver Ficha</a>
+                </div>
+            </article>
+
+        </section>
+
+    </div>
+</main>
+
+</body>
+</html>

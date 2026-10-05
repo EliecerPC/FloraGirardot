@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FloraGirardot - Participación Comunitaria</title>
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Header Superior -->
+<header class="main-header">
+    <div class="header-container">
+        <div class="logo-group">
+            <img src="../public/assets/img/logo-floragirardot.svg" alt="Isotipo FloraGirardot" class="logo-icon">
+            <span class="logo-title">FloraGirardot</span>
+        </div>
+
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">Inicio</a>
+            <a href="catalogo.html" class="nav-link">Catálogo</a>
+            <a href="#acerca" class="nav-link">Acerca de</a>
+            <a href="catalogo.html" class="btn-buscar">Buscar</a>
+        </nav>
+    </div>
+</header>
+
+<!-- Layout Principal de Participación -->
+<main class="participation-container">
+
+    <!-- Columna Izquierda: Últimos Reportes -->
+    <aside class="reports-sidebar">
+        <h1 class="participation-title">Participación<br>Comunitaria</h1>
+
+        <div class="reports-box">
+            <h2 class="reports-header-title">ÚLTIMOS REPORTES DE LA COMUNIDAD</h2>
+
+            <!-- Reporte 1 (Muestra estática / simulada) -->
+            <article class="report-card">
+                <div class="report-img-wrapper">
+                    <img src="../public/assets/img/acacia-roja-hero.svg" alt="Reporte Acacia">
+                </div>
+                <div class="report-info-wrapper">
+                    <div class="placeholder-lines">
+                        <span class="line line-long"></span>
+                        <span class="line line-medium"></span>
+                    </div>
+                    <button type="button" class="btn-report-white">Ver Reporte</button>
+                </div>
+            </article>
+
+            <!-- Reporte 2 -->
+            <article class="report-card">
+                <div class="report-img-wrapper">
+                    <img src="../public/assets/img/acacia-roja-hero.svg" alt="Reporte Acacia">
+                </div>
+                <div class="report-info-wrapper">
+                    <div class="placeholder-lines">
+                        <span class="line line-long"></span>
+                        <span class="line line-medium"></span>
+                    </div>
+                    <button type="button" class="btn-report-white">Ver Reporte</button>
+                </div>
+            </article>
+        </div>
+    </aside>
+
+    <!-- Columna Derecha: Formulario de Aporte -->
+    <section class="form-section">
+        <div class="form-container-card">
+            <h2 class="form-header-title">FORMULARIO DE APORTE</h2>
+
+            <form action="#" method="POST" class="contribution-form">
+
+                <div class="form-grid-top">
+                    <!-- Campos de Texto a la izquierda -->
+                    <div class="form-fields-left">
+                        <div class="input-group">
+                            <input type="text" placeholder="Planta" class="form-input">
+                        </div>
+
+                        <div class="input-group">
+                            <textarea placeholder="Notas / Uso comunitario:" class="form-textarea"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Caja de Subida de Imagen a la derecha -->
+                    <div class="upload-image-box">
+                        <label for="image-upload" class="upload-label">
+                            <!-- Icono Vectorial SVG similar al prototipo -->
+                            <svg class="upload-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="24" height="24" rx="6" fill="#00A884"/>
+                                <path d="M7 17L11 12L13 14.5L16 11L20 17H7Z" fill="#F4B400"/>
+                                <circle cx="15" cy="8" r="1.5" fill="#F4B400"/>
+                            </svg>
+                            <input type="file" id="image-upload" accept="image/*" class="file-input-hidden">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Campo Ubicación full-width -->
+                <div class="input-group full-width">
+                    <input type="text" placeholder="Ubicación:" class="form-input">
+                </div>
+
+                <!-- Botón Enviar Reporte -->
+                <div class="form-submit-wrapper">
+                    <button type="button" class="btn-submit-green">Enviar Reporte</button>
+                </div>
+
+            </form>
+        </div>
+    </section>
+
+</main>
+
+</body>
+</html>

@@ -1,0 +1,15 @@
+# WebStorm / JetBrains (Ignora toda la carpeta .idea)
+.idea/
+
+# Entorno y credenciales
+.env
+.env.local
+.env.*.local
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+*.tmp
+
+# Archivos de logs
+*.log
