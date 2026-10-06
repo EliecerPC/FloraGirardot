@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FloraGirardot - Acacia roja</title>
+    <title>FloraGirardot - Ficha Técnica</title>
     <link rel="stylesheet" href="../public/css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -38,7 +38,7 @@
     <!-- Barra de Navegación Secundaria / Breadcrumbs -->
     <div class="breadcrumb-bar">
         <a href="catalogo.html" class="btn-return">Volver al catálogo</a>
-        <div class="species-title-badge">Acacia roja - Delonix regia</div>
+        <div class="species-title-badge">Cargando...</div>
     </div>
 
     <!-- Bloque Superior: Galería y Datos Rápidos -->
@@ -46,20 +46,14 @@
 
         <!-- Columna Izquierda: Imagen Principal -->
         <div class="species-image-box">
-            <img src="../public/assets/img/acacia-roja-hero.svg" alt="Acacia roja en Girardot">
+            <img src="../public/assets/img/placeholder.jpg" alt="Especie de Girardot">
         </div>
 
         <!-- Columna Derecha: Tarjetas Taxonómicas -->
         <div class="species-details-box">
             <div class="section-badge-header">Ficha Técnica</div>
-
             <div class="taxonomy-list-card">
-                <p><strong>Nombre común:</strong> Acacia roja, acacio rojo, acacia de Girardot, flamboyán.</p>
-                <p><strong>Nombre científico:</strong> <em>Delonix regia</em>.</p>
-                <p><strong>Familia:</strong> Fabaceae.</p>
-                <p><strong>Origen:</strong> Madagascar (Introducida).</p>
-                <p><strong>Tipo de planta:</strong> Árbol ornamental.</p>
-                <p><strong>Rango altitudinal:</strong> 0 – 1200 m s. n. m.</p>
+                <!-- Inyectado dinámicamente por ficha.js -->
             </div>
         </div>
 
@@ -68,55 +62,24 @@
     <!-- Bloque Inferior 1: Descripción Botánica -->
     <section class="info-block-card">
         <h2>DESCRIPCIÓN BOTÁNICA</h2>
-        <p>
-            Árbol de copa amplia y visualmente distintiva que puede alcanzar aproximadamente 15 metros de altura. Presenta tronco grueso con corteza gris y hojas compuestas bipinnadas. Sus flores rojas o rojo-anaranjadas constituyen su principal elemento visual. El fruto es una vaina alargada de color oscuro con numerosas semillas.
-        </p>
+        <p><!-- Inyectado dinámicamente por ficha.js --></p>
     </section>
 
     <!-- Bloque Inferior 2: Distribución e Importancia Local -->
     <section class="info-block-card">
         <h2>IMPORTANCIA PARA GIRARDOT Y DISTRIBUCIÓN</h2>
-        <p>
-            La especie posee un valor particular dentro de la identidad y el paisaje urbano de Girardot, siendo identificada históricamente como la "Acacia de Girardot". Se encuentra asociada a condiciones de Bosque Seco Tropical dentro del casco urbano y zonas de ribera del Alto Magdalena.
-        </p>
+        <p><!-- Inyectado dinámicamente por ficha.js --></p>
     </section>
 
     <!-- Bloque Inferior 3: Mapa Interactivo de Ubicación (Leaflet) -->
     <section class="info-block-card">
         <h2>REGISTRO DE UBICACIÓN EN GIRARDOT</h2>
-        <p class="map-subtitle">Puntos georreferenciados de presencia de <em>Delonix regia</em> en el municipio:</p>
+        <p class="map-subtitle">Puntos georreferenciados de presencia en el municipio:</p>
         <div id="mapa-girardot" class="leaflet-map-box"></div>
     </section>
 
 </main>
 
-<!-- Script para Inicializar el Mapa de Leaflet -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        // 1. Centrar mapa en Girardot (Lat, Lng, Zoom)
-        const map = L.map('mapa-girardot').setView([4.3023, -74.8061], 14);
-
-        // 2. Capa gratuita OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 18,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
-
-        // 3. Puntos de presencia de Acacia Roja registrados en la DB
-        const puntosAcacia = [
-            { nombre: "Parque Bolívar - Girardot", lat: 4.3045, lng: -74.8055 },
-            { nombre: "Avenida del Ferrocarril", lat: 4.3010, lng: -74.8080 },
-            { nombre: "Malecón Río Magdalena", lat: 4.2985, lng: -74.8120 }
-        ];
-
-        // 4. Agregar marcadores al mapa
-        puntosAcacia.forEach(punto => {
-            L.marker([punto.lat, punto.lng])
-                .addTo(map)
-                .bindPopup(`<b>Acacia roja</b><br>${punto.nombre}`);
-        });
-    });
-</script>
-
+<script src="../public/js/ficha.js"></script>
 </body>
 </html>
