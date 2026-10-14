@@ -1,11 +1,15 @@
-/* Variables Globales */
-:root {
-    --bg-color: #F0F0ED;             /* Blanco Hueso / Fondo suave */
-    --header-bg: #EAEAEA;           /* Gris claro cabecera */
-    --text-dark: #1E3A2B;            /* Verde Bosque para textos */
-    --btn-green: #2E5A44;            /* Verde Oliva para el botón Buscar */
 
-    /* Colores de la referencia borrador */
+/* ==========================================
+   VARIABLES GLOBALES
+   ========================================== */
+
+:root {
+    --bg-color: #F0F0ED;
+    --header-bg: #EAEAEA;
+    --text-dark: #1E3A2B;
+    --btn-green: #2E5A44;
+
+    /* Colores de la referencia de Girardot */
     --girardot-red: #D91017;
     --girardot-blue: #0073CF;
     --girardot-green: #008736;
@@ -26,11 +30,14 @@ body {
     flex-direction: column;
 }
 
-/* Header */
+/* ==========================================
+   HEADER Y NAVEGACIÓN
+   ========================================== */
+
 .main-header {
     background-color: var(--header-bg);
     padding: 12px 40px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .header-container {
@@ -86,7 +93,10 @@ body {
     font-size: 15px;
 }
 
-/* Hero Section */
+/* ==========================================
+   PÁGINA DE INICIO
+   ========================================== */
+
 .hero-container {
     max-width: 1200px;
     margin: auto;
@@ -104,7 +114,6 @@ body {
     margin-bottom: 10px;
 }
 
-/* Estilos de la palabra GIRARDOT */
 .city-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 85px;
@@ -115,8 +124,13 @@ body {
     line-height: 1;
 }
 
-.text-red { color: var(--girardot-red); }
-.text-green { color: var(--girardot-green); }
+.text-red {
+    color: var(--girardot-red);
+}
+
+.text-green {
+    color: var(--girardot-green);
+}
 
 .badge-blue {
     background-color: var(--girardot-blue);
@@ -127,7 +141,6 @@ body {
     display: inline-block;
 }
 
-/* Imagen Hero con bordes redondeados */
 .hero-image-side {
     width: 480px;
     height: 380px;
@@ -138,11 +151,11 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 24px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* ==========================================
-   ESTILOS ESPECÍFICOS VISTA CATÁLOGO
+   VISTA CATÁLOGO
    ========================================== */
 
 .catalog-layout {
@@ -152,7 +165,8 @@ body {
     width: 100%;
 }
 
-/* Área de Título y Buscador */
+/* Título y buscador */
+
 .catalog-header-area {
     display: flex;
     align-items: center;
@@ -187,7 +201,8 @@ body {
     color: #555555;
 }
 
-/* Estructura de 2 Columnas */
+/* Estructura de columnas */
+
 .catalog-body {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -195,7 +210,8 @@ body {
     align-items: start;
 }
 
-/* Sidebar Filtros */
+/* Sidebar de filtros */
+
 .filters-sidebar {
     background-color: #DCDCDC;
     border-radius: 20px;
@@ -224,7 +240,8 @@ body {
     margin-bottom: 4px;
 }
 
-/* Checkbox Personalizado tipo Píldora redondeada */
+/* Checkbox personalizado */
+
 .custom-checkbox {
     display: flex;
     align-items: center;
@@ -250,24 +267,24 @@ body {
 }
 
 .custom-checkbox input:checked ~ .checkmark {
-    background-color: #008736; /* Verde activo */
+    background-color: #008736;
 }
 
-/* Grilla de Tarjetas */
+/* Tarjetas de especies */
+
 .cards-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 24px;
 }
 
-/* Tarjeta Horizontal Verde */
 .species-card-horizontal {
-    background-color: #10B950; /* Verde brillante esmeralda del prototipo */
+    background-color: #10B950;
     border-radius: 24px;
     display: flex;
     height: 180px;
     overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
 .card-img-wrapper {
@@ -322,11 +339,11 @@ body {
     font-size: 14px;
     width: max-content;
     align-self: flex-start;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 /* ==========================================
-   ESTILOS ESPECÍFICOS VISTA FICHA TÉCNICA
+   VISTA FICHA TÉCNICA
    ========================================== */
 
 .sheet-container {
@@ -338,7 +355,8 @@ body {
     gap: 20px;
 }
 
-/* Breadcrumb Bar */
+/* Barra de navegación interna */
+
 .breadcrumb-bar {
     display: flex;
     gap: 15px;
@@ -346,7 +364,7 @@ body {
 }
 
 .btn-return {
-    background-color: #10B950; /* Verde esmeralda */
+    background-color: #10B950;
     color: #FFFFFF;
     text-decoration: none;
     padding: 10px 22px;
@@ -365,7 +383,8 @@ body {
     flex: 1;
 }
 
-/* Disposición Superior (2 Columnas) */
+/* Información principal */
+
 .sheet-main-info {
     display: grid;
     grid-template-columns: 360px 1fr;
@@ -384,7 +403,7 @@ body {
     height: 100%;
     object-fit: cover;
     border-radius: 20px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
 }
 
 .species-details-box {
@@ -419,7 +438,8 @@ body {
     line-height: 1.4;
 }
 
-/* Bloques Grises de Información Inferior */
+/* Bloques inferiores de información */
+
 .info-block-card {
     background-color: #DCDCDC;
     border-radius: 20px;
@@ -445,16 +465,17 @@ body {
     color: #444444;
 }
 
-/* Contenedor del Mapa */
+/* Mapa */
+
 .leaflet-map-box {
     height: 320px;
     width: 100%;
     border-radius: 16px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 /* ==========================================
-   ESTILOS VISTA PARTICIPACIÓN COMUNITARIA
+   VISTA PARTICIPACIÓN COMUNITARIA
    ========================================== */
 
 .participation-container {
@@ -467,7 +488,8 @@ body {
     align-items: start;
 }
 
-/* Columna Izquierda: Reportes */
+/* Columna izquierda: reportes */
+
 .participation-title {
     font-family: 'Montserrat', sans-serif;
     font-size: 32px;
@@ -501,7 +523,7 @@ body {
     display: flex;
     height: 120px;
     overflow: hidden;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.06);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.06);
 }
 
 .report-img-wrapper {
@@ -539,8 +561,13 @@ body {
     display: block;
 }
 
-.line-long { width: 90%; }
-.line-medium { width: 65%; }
+.line-long {
+    width: 90%;
+}
+
+.line-medium {
+    width: 65%;
+}
 
 .btn-report-white {
     background-color: #FFFFFF;
@@ -554,7 +581,8 @@ body {
     width: max-content;
 }
 
-/* Columna Derecha: Formulario */
+/* Columna derecha: formulario */
+
 .form-container-card {
     background-color: #DCDCDC;
     border-radius: 20px;
@@ -611,7 +639,8 @@ body {
     color: #333333;
 }
 
-/* Caja de carga de imagen */
+/* Carga de imagen */
+
 .upload-image-box {
     background-color: #FFFFFF;
     border-radius: 20px;
@@ -641,7 +670,8 @@ body {
     display: none;
 }
 
-/* Botón Enviar */
+/* Botón de envío */
+
 .form-submit-wrapper {
     display: flex;
     justify-content: center;
@@ -657,5 +687,581 @@ body {
     font-weight: 700;
     font-size: 16px;
     cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================
+   AUTENTICACIÓN: INICIO DE SESIÓN Y REGISTRO
+   ========================================== */
+
+.auth-main {
+    width: 100%;
+    flex: 1;
+    display: grid;
+    place-items: center;
+    padding: 48px 20px;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 500px;
+    padding: 36px;
+    background-color: #DCDCDC;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px rgba(30, 58, 43, 0.08);
+}
+
+.auth-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    color: #2E5A44;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.auth-title {
+    margin-bottom: 12px;
+    color: #1E3A2B;
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.auth-description {
+    margin-bottom: 28px;
+    color: #454545;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.auth-form label {
+    margin-top: 8px;
+    color: #1E3A2B;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.auth-input {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    color: #222222;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.auth-input::placeholder {
+    color: #777777;
+}
+
+.auth-input:focus {
+    border-color: #2E7D50;
+    box-shadow: 0 0 0 3px rgba(46, 125, 80, 0.15);
+}
+
+.auth-submit {
+    width: 100%;
+    min-height: 48px;
+    margin-top: 18px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 14px;
+    background-color: #10B950;
+    color: #FFFFFF;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.auth-submit:hover {
+    background-color: #008736;
+}
+
+.auth-submit:focus-visible {
+    outline: 3px solid #2E5A44;
+    outline-offset: 3px;
+}
+
+.auth-submit:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.auth-message {
+    margin-top: 16px;
+    color: #1E3A2B;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.auth-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #C2C2C2;
+    color: #454545;
+    font-size: 13px;
+    line-height: 1.7;
+    text-align: center;
+}
+
+.auth-card a {
+    color: #21683C;
+    font-weight: 600;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+}
+
+.auth-card a:hover {
+    color: #008736;
+}
+
+/* ==========================================
+   REVISIÓN DE REPORTES COMUNITARIOS
+   ========================================== */
+
+.review-main {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 48px 5% 64px;
+}
+
+.review-heading {
+    max-width: 760px;
+    margin-bottom: 36px;
+}
+
+.review-eyebrow {
+    display: block;
+    margin-bottom: 10px;
+    color: #2E5A44;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+}
+
+.review-title {
+    margin-bottom: 16px;
+    color: #1E3A2B;
+    font-family: 'Montserrat', sans-serif;
+    font-size: clamp(28px, 4vw, 38px);
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.review-description {
+    max-width: 680px;
+    color: #454545;
+    font-size: 15px;
+    line-height: 1.8;
+}
+
+.review-panel {
+    padding: 28px;
+    border: 1px solid #E0E4DE;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+    box-shadow: 0 6px 22px rgba(30, 58, 43, 0.06);
+}
+
+.review-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #E5E8E3;
+}
+
+.review-section-title {
+    margin-bottom: 8px;
+    color: #1E3A2B;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+}
+
+.review-section-description {
+    color: #626A62;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.review-status {
+    margin: 20px 0;
+    color: #454545;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.review-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 20px;
+}
+
+/* Tarjetas de reportes */
+
+.review-card {
+    min-width: 0;
+    padding: 22px;
+    border: 1px solid #E0E4DE;
+    border-radius: 16px;
+    background-color: #FFFFFF;
+    box-shadow: 0 3px 12px rgba(30, 58, 43, 0.04);
+    transition: box-shadow 0.2s, border-color 0.2s;
+    cursor: pointer;
+}
+
+.review-card:hover {
+    border-color: #B9D3BE;
+    box-shadow: 0 6px 18px rgba(30, 58, 43, 0.08);
+}
+
+.review-card:focus-visible {
+    outline: 3px solid #78A982;
+    outline-offset: 3px;
+}
+
+.review-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.review-card-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    color: #1E3A2B;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+/* Estados de los reportes */
+
+.review-badge {
+    display: inline-block;
+    max-width: 100%;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.review-badge-pending {
+    background-color: #FFF0CC;
+    color: #795400;
+}
+
+.review-badge-approved {
+    background-color: #DDF4E4;
+    color: #21683C;
+}
+
+.review-badge-rejected {
+    background-color: #FBE3E3;
+    color: #9D2525;
+}
+
+.review-badge-correction {
+    background-color: #E4EDFC;
+    color: #28569A;
+}
+
+.review-badge-neutral {
+    background-color: #ECEEEC;
+    color: #454545;
+}
+
+/* Datos y observaciones */
+
+.review-card-details {
+    display: grid;
+    gap: 10px;
+}
+
+.review-detail {
+    margin: 0;
+    color: #454545;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.review-observations {
+    margin: 6px 0 0;
+    padding: 14px;
+    border-left: 3px solid #78A982;
+    border-radius: 0 8px 8px 0;
+    background-color: #F4F7F2;
+    color: #35443A;
+    font-size: 13px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* Acciones de revisión */
+
+.review-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: 1px solid #E5E8E3;
+}
+
+.review-button {
+    min-height: 42px;
+    padding: 10px 14px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.review-button:focus-visible {
+    outline: 3px solid #A7C9AD;
+    outline-offset: 2px;
+}
+
+.review-button-approve {
+    background-color: #2E7D50;
+    color: #FFFFFF;
+}
+
+.review-button-approve:hover {
+    background-color: #21683C;
+}
+
+.review-button-reject {
+    border-color: #E7B9B9;
+    background-color: #FFFFFF;
+    color: #9D2525;
+}
+
+.review-button-reject:hover {
+    border-color: #C75B5B;
+    background-color: #FBE3E3;
+}
+
+.review-button-correction {
+    border-color: #B8CBE8;
+    background-color: #FFFFFF;
+    color: #28569A;
+}
+
+.review-button-correction:hover {
+    border-color: #7FA2D8;
+    background-color: #EAF1FC;
+}
+
+/* ==========================================
+   VENTANA DE DETALLE DEL APORTE
+   ========================================== */
+
+.review-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0;
+
+    width: min(720px, calc(100% - 32px));
+    max-width: 720px;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+
+    border: 1px solid #DDE5DB;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+    color: #454545;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.review-dialog::backdrop {
+    background-color: rgba(20, 35, 25, 0.62);
+}
+
+.review-dialog-content {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.review-dialog-title {
+    margin: 0 0 4px;
+    color: #1E3A2B;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 24px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.review-dialog-subtitle {
+    margin: 16px 0 0;
+    color: #1E3A2B;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.review-dialog-text {
+    margin: 0;
+    color: #454545;
+    font-size: 14px;
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.review-dialog-image {
+    display: block;
+    width: 100%;
+    max-height: 420px;
+    object-fit: contain;
+    border-radius: 12px;
+    background-color: #F4F7F2;
+}
+
+.review-dialog-close {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    margin-top: 24px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 12px;
+    background-color: #2E5A44;
+    color: #FFFFFF;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.review-dialog-close:hover {
+    background-color: #1E3A2B;
+}
+
+.review-dialog-close:focus-visible {
+    outline: 3px solid #78A982;
+    outline-offset: 3px;
+}
+
+/* ==========================================
+   ADAPTACIÓN A PANTALLAS PEQUEÑAS
+   ========================================== */
+
+@media (max-width: 600px) {
+    /* Header */
+
+    .main-header {
+        padding: 12px 18px;
+    }
+
+    .header-container {
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .nav-menu {
+        flex-wrap: wrap;
+        gap: 12px 16px;
+    }
+
+    /* Autenticación */
+
+    .auth-main {
+        padding: 28px 16px;
+        align-items: start;
+    }
+
+    .auth-card {
+        padding: 26px 20px;
+        border-radius: 18px;
+    }
+
+    .auth-title {
+        font-size: 28px;
+    }
+
+    /* Revisión de reportes */
+
+    .review-main {
+        padding: 30px 16px 40px;
+    }
+
+    .review-heading {
+        margin-bottom: 24px;
+    }
+
+    .review-panel {
+        padding: 20px 16px;
+        border-radius: 16px;
+    }
+
+    .review-panel-heading {
+        align-items: flex-start;
+    }
+
+    .review-section-title {
+        font-size: 19px;
+    }
+
+    .review-list {
+        grid-template-columns: 1fr;
+    }
+
+    .review-card {
+        padding: 18px;
+    }
+
+    .review-card-header {
+        flex-direction: column;
+    }
+
+    .review-actions {
+        flex-direction: column;
+    }
+
+    .review-button {
+        width: 100%;
+    }
+
+    /* Ventana de detalle */
+
+    .review-dialog {
+        padding: 22px 18px;
+        border-radius: 16px;
+    }
+
+    .review-dialog-title {
+        font-size: 21px;
+    }
 }

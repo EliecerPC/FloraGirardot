@@ -20,12 +20,47 @@
         </nav>
     </div>
 </header>
-<main class="catalog-body" style="padding:2rem 5%;display:block">
-    <h1 class="catalog-title">Revisión de reportes comunitarios</h1>
-    <p>Esta sección está disponible únicamente para administradores y revisores científicos.</p>
-    <p id="mensaje-revision" role="status" aria-live="polite">Comprobando permisos…</p>
-    <section id="lista-revision" style="display:grid;gap:1rem"></section>
+
+<main class="review-main">
+    <section class="review-heading">
+        <span class="review-eyebrow">Gestión de la comunidad</span>
+
+        <h1 class="review-title">Revisión de reportes</h1>
+
+        <p class="review-description">
+            Consulta las observaciones compartidas por los ciudadanos
+            y revisa la información antes de incorporarla al catálogo
+            de FloraGirardot.
+        </p>
+    </section>
+
+    <section class="review-panel">
+        <div class="review-panel-heading">
+            <div>
+                <h2 class="review-section-title">Reportes pendientes</h2>
+                <p class="review-section-description">
+                    Revisa los datos y las evidencias de cada reporte.
+                </p>
+            </div>
+        </div>
+
+        <p
+                id="mensaje-revision"
+                class="review-status"
+                role="status"
+                aria-live="polite"
+        >
+            Comprobando permisos…
+        </p>
+
+        <section
+                id="lista-revision"
+                class="review-list"
+                aria-label="Lista de reportes comunitarios"
+        ></section>
+    </section>
 </main>
+
 <script src="../public/js/revision.js"></script>
 </body>
 </html>

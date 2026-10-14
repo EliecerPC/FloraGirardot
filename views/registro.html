@@ -22,23 +22,69 @@
         </nav>
     </div>
 </header>
-<main class="catalog-body" style="padding:3rem 5%;justify-content:center">
-    <section class="filters-sidebar" style="max-width:520px;width:100%;margin:0 auto;padding:2rem;border-radius:20px">
-        <h1 class="catalog-title">Únete a FloraGirardot</h1>
-        <p>Regístrate como ciudadano para compartir observaciones de la flora urbana.</p>
-        <form id="form-auth" data-mode="registro">
-            <label for="nombre">Nombre</label>
-            <input class="search-input" id="nombre" name="nombre" autocomplete="name" minlength="2" maxlength="100" required style="width:100%;margin:.5rem 0 1rem">
+
+<main class="auth-main">
+    <section class="auth-card">
+        <span class="auth-eyebrow">Comunidad FloraGirardot</span>
+
+        <h1 class="auth-title">Únete a FloraGirardot</h1>
+
+        <p class="auth-description">
+            Crea tu cuenta ciudadana y comparte tus observaciones
+            sobre las plantas y los espacios verdes de Girardot.
+        </p>
+
+        <form id="form-auth" data-mode="registro" class="auth-form">
+            <label for="nombre">Nombre completo</label>
+            <input
+                    class="auth-input"
+                    id="nombre"
+                    name="nombre"
+                    type="text"
+                    autocomplete="name"
+                    minlength="2"
+                    maxlength="100"
+                    placeholder="¿Cómo te llamas?"
+                    required
+            >
+
             <label for="correo">Correo electrónico</label>
-            <input class="search-input" id="correo" name="correo" type="email" autocomplete="email" maxlength="150" required style="width:100%;margin:.5rem 0 1rem">
-            <label for="contrasena">Contraseña (mínimo 8 caracteres)</label>
-            <input class="search-input" id="contrasena" name="contrasena" type="password" autocomplete="new-password" minlength="8" maxlength="72" required style="width:100%;margin:.5rem 0 1rem">
-            <button type="submit" class="btn-card-white" style="background:#00b04f;color:white;border:0;padding:.8rem 1.5rem;border-radius:25px;cursor:pointer">Crear cuenta</button>
+            <input
+                    class="auth-input"
+                    id="correo"
+                    name="correo"
+                    type="email"
+                    autocomplete="email"
+                    maxlength="150"
+                    placeholder="nombre@correo.com"
+                    required
+            >
+
+            <label for="contrasena">Contraseña</label>
+            <input
+                    class="auth-input"
+                    id="contrasena"
+                    name="contrasena"
+                    type="password"
+                    autocomplete="new-password"
+                    minlength="8"
+                    maxlength="72"
+                    placeholder="Mínimo 8 caracteres"
+                    required
+            >
+
+            <button type="submit" class="auth-submit">Crear mi cuenta</button>
         </form>
-        <p id="auth-mensaje" role="status" aria-live="polite"></p>
-        <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>.</p>
+
+        <p id="auth-mensaje" class="auth-message" role="status" aria-live="polite"></p>
+
+        <p class="auth-footer">
+            ¿Ya tienes cuenta?
+            <a href="login.html">Inicia sesión</a>.
+        </p>
     </section>
 </main>
+
 <script src="../public/js/auth.js"></script>
 </body>
 </html>

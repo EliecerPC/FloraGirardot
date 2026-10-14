@@ -281,6 +281,6 @@ app.use((err, _req, res, _next) => {
 app.listen(PORT, () => {
     console.log('Servidor corriendo en http://localhost:' + PORT);
     if (!process.env.SESSION_SECRET) {
-        console.warn('Aviso: configura SESSION_SECRET en .env antes de usar el sistema fuera de desarrollo.');
+        console.warn('...');
     }
 });

@@ -22,21 +22,54 @@
         </nav>
     </div>
 </header>
-<main class="catalog-body" style="padding:3rem 5%;justify-content:center">
-    <section class="filters-sidebar" style="max-width:520px;width:100%;margin:0 auto;padding:2rem;border-radius:20px">
-        <h1 class="catalog-title">Iniciar sesión</h1>
-        <p>Accede para enviar reportes o gestionar las tareas que correspondan a tu rol.</p>
-        <form id="form-auth" data-mode="login">
+
+<main class="auth-main">
+    <section class="auth-card">
+        <span class="auth-eyebrow">Comunidad FloraGirardot</span>
+
+        <h1 class="auth-title">Iniciar sesión</h1>
+
+        <p class="auth-description">
+            Accede a tu cuenta para compartir observaciones de la flora
+            urbana y consultar las funciones disponibles para tu usuario.
+        </p>
+
+        <form id="form-auth" data-mode="login" class="auth-form">
             <label for="correo">Correo electrónico</label>
-            <input class="search-input" id="correo" name="correo" type="email" autocomplete="email" maxlength="150" required style="width:100%;margin:.5rem 0 1rem">
+            <input
+                    class="auth-input"
+                    id="correo"
+                    name="correo"
+                    type="email"
+                    autocomplete="email"
+                    maxlength="150"
+                    placeholder="nombre@correo.com"
+                    required
+            >
+
             <label for="contrasena">Contraseña</label>
-            <input class="search-input" id="contrasena" name="contrasena" type="password" autocomplete="current-password" required style="width:100%;margin:.5rem 0 1rem">
-            <button type="submit" class="btn-card-white" style="background:#00b04f;color:white;border:0;padding:.8rem 1.5rem;border-radius:25px;cursor:pointer">Entrar</button>
+            <input
+                    class="auth-input"
+                    id="contrasena"
+                    name="contrasena"
+                    type="password"
+                    autocomplete="current-password"
+                    placeholder="Ingresa tu contraseña"
+                    required
+            >
+
+            <button type="submit" class="auth-submit">Entrar a mi cuenta</button>
         </form>
-        <p id="auth-mensaje" role="status" aria-live="polite"></p>
-        <p>¿Aún no tienes cuenta? <a href="registro.html">Regístrate como ciudadano</a>.</p>
+
+        <p id="auth-mensaje" class="auth-message" role="status" aria-live="polite"></p>
+
+        <p class="auth-footer">
+            ¿Aún no tienes cuenta?
+            <a href="registro.html">Regístrate como ciudadano</a>.
+        </p>
     </section>
 </main>
+
 <script src="../public/js/auth.js"></script>
 </body>
 </html>

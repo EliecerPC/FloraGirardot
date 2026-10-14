@@ -138,6 +138,184 @@ document.addEventListener('DOMContentLoaded', async () => {
         return elemento;
     }
 
+
+    function mostrarDetalleAporte(aporte, esPropio = false) {
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 9999;
+            overflow-y: auto;
+        `;
+
+        const contenido = document.createElement('section');
+        contenido.setAttribute('role', 'dialog');
+        contenido.setAttribute('aria-modal', 'true');
+        contenido.setAttribute('aria-labelledby', 'titulo-detalle-aporte');
+        contenido.style.cssText = `
+            background: #F0F0ED;
+            color: #1E3A2B;
+            width: 100%;
+            max-width: 650px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 25px;
+            border-radius: 20px;
+            position: relative;
+        `;
+
+        const cerrar = document.createElement('button');
+        cerrar.type = 'button';
+        cerrar.textContent = 'Cerrar ✕';
+        cerrar.style.cssText = `
+            display: block;
+            margin-left: auto;
+            padding: 8px 14px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        `;
+        cerrar.addEventListener('click', () => modal.remove());
+
+        contenido.appendChild(cerrar);
+
+
+        const descripcion = aporte.descripcion || '';
+        const campos = descripcion.split('|');
+
+        const nombrePlanta = campos
+            .find(campo => /Especie:/i.test(campo))
+            ?.replace(/Especie:/i, '')
+            .trim() || 'Planta sin identificar';
+
+        const ubicacion = campos
+            .find(campo => /Sector:/i.test(campo))
+            ?.replace(/Sector:/i, '')
+            .trim() || 'No especificado';
+
+        const titulo = agregarTexto(
+            contenido,
+            'h2',
+            nombrePlanta
+        );
+
+        titulo.id = 'titulo-detalle-aporte';
+        titulo.style.margin = '15px 0';
+
+        agregarTexto(
+            contenido,
+            'p',
+            'Nombre de la planta: ' + nombrePlanta
+        );
+
+        agregarTexto(
+            contenido,
+            'p',
+            'Sector o ubicación: ' + ubicacion
+        );
+
+
+        const observaciones = aporte.observaciones || '';
+        const partes = observaciones.split(' | ');
+
+        const notas = partes
+            .filter(parte => !/^\s*Foto:/i.test(parte))
+            .join(' | ')
+            .trim();
+
+        agregarTexto(
+            contenido,
+            'p',
+            'Observaciones: ' + (notas || 'Sin observaciones')
+        );
+
+
+        if (aporte.autor) {
+            agregarTexto(contenido, 'p', 'Compartido por: ' + aporte.autor);
+        }
+
+        if (aporte.fecha_envio) {
+            const fecha = new Date(aporte.fecha_envio);
+            agregarTexto(
+                contenido,
+                'p',
+                'Fecha: ' + (
+                    Number.isNaN(fecha.getTime())
+                        ? aporte.fecha_envio
+                        : fecha.toLocaleString('es-CO')
+                )
+            );
+        }
+
+        if (esPropio && aporte.estado) {
+            const estados = {
+                pendiente: 'Pendiente de revisión',
+                verificado: 'Aprobado',
+                rechazado: 'Rechazado',
+                requiere_correccion: 'Requiere corrección'
+            };
+
+            agregarTexto(
+                contenido,
+                'p',
+                'Estado: ' + (estados[aporte.estado] || aporte.estado)
+            );
+        }
+
+        // Extraer el nombre de archivo de la ruta guardada en observaciones.
+        const coincidencia = observaciones.match(
+            /Foto:\s*(?:\.\.\/assets\/img\/|\/assets\/img\/|assets\/img\/)?([^/\\\s|]+\.(?:jpg|jpeg|png|webp))/i
+        );
+
+        if (coincidencia) {
+            const imagen = document.createElement('img');
+            imagen.src = API_BASE + '/assets/img/' + coincidencia[1];
+            imagen.alt = 'Fotografía del aporte';
+            imagen.style.cssText = `
+            display: block;
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            margin-top: 20px;
+            border-radius: 12px;
+            background: white;
+        `;
+
+            imagen.addEventListener('error', () => {
+                imagen.alt = 'No se pudo cargar la fotografía.';
+            });
+
+            contenido.appendChild(imagen);
+        }
+
+        modal.appendChild(contenido);
+
+        modal.addEventListener('click', event => {
+            if (event.target === modal) modal.remove();
+        });
+
+        const cerrarConEscape = event => {
+            if (event.key === 'Escape' && modal.isConnected) {
+                modal.remove();
+                document.removeEventListener('keydown', cerrarConEscape);
+            }
+        };
+
+        document.addEventListener('keydown', cerrarConEscape);
+        modal.addEventListener('remove', () => {
+            document.removeEventListener('keydown', cerrarConEscape);
+        });
+
+        document.body.appendChild(modal);
+        cerrar.focus();
+    }
+
+
     async function cargarAportes() {
         if (!listaAportes) return;
         listaAportes.replaceChildren();
@@ -150,26 +328,85 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+
             aportes.forEach(aporte => {
-                const tarjeta = document.createElement('article');
-                tarjeta.className = 'species-card-horizontal';
-                tarjeta.style.cssText = 'background:#00b04f;border-radius:15px;padding:.8rem;min-height:90px;display:flex;align-items:center;gap:1rem';
+                const tarjeta = document.createElement('button');
+                tarjeta.type = 'button';
+
+                tarjeta.style.cssText = `
+                    display: block;
+                    width: 100%;
+                    padding: 0;
+                    overflow: hidden;
+                    text-align: left;
+                    cursor: pointer;
+                    border: 1px solid #d1e7d5;
+                    border-radius: 12px;
+                    background: white;
+                    color: #244b35;
+                `;
+
+                // Obtener el nombre de la planta
+                const coincidencia = aporte.descripcion.match(
+                    /Especie:\s*(.*?)(?:\s*\|\s*Sector:|$)/i
+                );
+
+                const nombrePlanta = coincidencia
+                    ? coincidencia[1].trim()
+                    : aporte.descripcion;
+
+                // Obtener la fotografía subida por el usuario
+                const coincidenciaFoto = aporte.observaciones?.match(
+                    /Foto:\s*(?:\.\.\/assets\/img\/|\/assets\/img\/|assets\/img\/)?([^/\\\s|]+\.(?:jpg|jpeg|png|webp))/i
+                );
 
                 const imagen = document.createElement('img');
-                imagen.src = '../public/assets/img/acacia-card.jpg';
-                imagen.alt = 'Ilustración de planta';
-                imagen.style.cssText = 'width:70px;height:70px;object-fit:cover;border-radius:10px;flex-shrink:0';
-                tarjeta.appendChild(imagen);
 
-                const texto = document.createElement('div');
-                texto.style.cssText = 'color:white;flex:1;min-width:0';
-                const titulo = (aporte.descripcion || 'Reporte de planta').split('|')[0].trim();
-                agregarTexto(texto, 'h3', titulo).style.cssText = 'color:white;font-size:1rem;margin:0';
-                agregarTexto(texto, 'p', (aporte.observaciones || 'Sin observaciones').slice(0, 160)).style.cssText = 'color:rgba(255,255,255,.9);font-size:.8rem;margin:.4rem 0';
-                agregarTexto(texto, 'small', 'Compartido por ' + (aporte.autor || 'Ciudadano')).style.color = 'white';
-                tarjeta.appendChild(texto);
+                imagen.src = coincidenciaFoto
+                    ? `${API_BASE}/assets/img/${coincidenciaFoto[1]}`
+                    : '../public/assets/img/acacia-card.jpg';
+
+                imagen.alt = `Fotografía de ${nombrePlanta}`;
+
+                imagen.style.cssText = `
+                    display: block;
+                    width: 100%;
+                    height: 180px;
+                    object-fit: cover;
+                `;
+
+                // Nombre de la planta
+                const titulo = document.createElement('h3');
+                titulo.textContent = nombrePlanta;
+
+                titulo.style.cssText = `
+                    margin: 12px 14px 5px;
+                    font-size: 1.1rem;
+                `;
+
+                // Nombre del usuario
+                const autor = document.createElement('p');
+                autor.textContent = aporte.autor || 'Usuario';
+
+                autor.style.cssText = `
+                    margin: 0 14px 14px;
+                    font-size: 0.9rem;
+                    color: #587261;
+                `;
+
+                tarjeta.appendChild(imagen);
+                tarjeta.appendChild(titulo);
+                tarjeta.appendChild(autor);
+
+                // Al pulsar, se abre el detalle completo
+                tarjeta.addEventListener('click', () => {
+                    mostrarDetalleAporte(aporte);
+                });
+
                 listaAportes.appendChild(tarjeta);
             });
+
+
         } catch (error) {
             console.error('Error al cargar lista de aportes:', error);
             agregarTexto(listaAportes, 'p', 'No se pudieron cargar los reportes. Verifica que el servidor esté iniciado.');
@@ -195,12 +432,42 @@ document.addEventListener('DOMContentLoaded', async () => {
                 agregarTexto(seccion, 'p', 'Aún no has enviado reportes.');
                 return;
             }
+
             aportes.forEach(aporte => {
-                const estado = aporte.estado === 'verificado' ? 'Aprobado' :
-                    aporte.estado === 'rechazado' ? 'Rechazado' :
-                    aporte.estado === 'requiere_correccion' ? 'Requiere corrección' : 'Pendiente de revisión';
-                agregarTexto(seccion, 'p', (aporte.descripcion || 'Reporte') + ' — ' + estado);
+                const estados = {
+                    verificado: 'Aprobado',
+                    rechazado: 'Rechazado',
+                    requiere_correccion: 'Requiere corrección',
+                    pendiente: 'Pendiente de revisión'
+                };
+
+                const boton = document.createElement('button');
+                boton.type = 'button';
+                boton.textContent =
+                    (aporte.descripcion || 'Reporte') + ' — ' +
+                    (estados[aporte.estado] || aporte.estado) +
+                    ' · Ver detalle';
+
+                boton.style.cssText = `
+                    display: block;
+                    width: 100%;
+                    padding: 12px;
+                    margin: 8px 0;
+                    text-align: left;
+                    background: white;
+                    color: #1E3A2B;
+                    border: 1px solid #c5c5c5;
+                    border-radius: 10px;
+                    cursor: pointer;
+                `;
+
+                boton.addEventListener('click', () => {
+                    mostrarDetalleAporte(aporte, true);
+                });
+
+                seccion.appendChild(boton);
             });
+
         } catch (error) {
             console.error('Error al consultar mis reportes:', error);
         }
