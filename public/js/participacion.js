@@ -76,6 +76,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             });
             sesionInfo.appendChild(cerrar);
+            if (['admin', 'investigador'].includes(usuario.rol)) {
+                const revision = document.createElement('a');
+                revision.href = 'revision.html';
+                revision.textContent = ' Abrir bandeja de revisión';
+                sesionInfo.appendChild(revision);
+            }
             formularioAporte.style.display = '';
             return usuario;
         } catch (error) {
