@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    const API_BASE = 'http://' + (window.location.hostname || 'localhost') + ':3000';
     const formAporte = document.getElementById('form-aporte');
     const listaAportes = document.getElementById('lista-aportes');
     const mensajeFeedback = document.getElementById('mensaje-feedback');
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function comprobarSesion() {
         try {
-            const response = await fetch('http://localhost:3000/api/auth/me', { credentials: 'include' });
+            const response = await fetch(API_BASE + '/api/auth/me', { credentials: 'include' });
             if (!response.ok) {
                 formularioAporte.style.display = 'none';
                 mostrarEnlaceSesion('Para enviar un reporte comunitario,', 'login.html', 'inicia sesión');
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             cerrar.textContent = 'Cerrar sesión';
             cerrar.addEventListener('click', async () => {
                 try {
-                    await fetch('http://localhost:3000/api/auth/logout', {
+                    await fetch(API_BASE + '/api/auth/logout', {
                         method: 'POST',
                         credentials: 'include'
                     });
@@ -103,7 +104,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const boton = formAporte.querySelector('button[type="submit"]');
             boton.disabled = true;
             try {
-                const response = await fetch('http://localhost:3000/api/aportes', {
+                const response = await fetch(API_BASE + '/api/aportes', {
                     method: 'POST',
                     credentials: 'include',
                     body: formData
@@ -141,7 +142,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!listaAportes) return;
         listaAportes.replaceChildren();
         try {
-            const response = await fetch('http://localhost:3000/api/aportes', { credentials: 'include' });
+            const response = await fetch(API_BASE + '/api/aportes', { credentials: 'include' });
             if (!response.ok) throw new Error('Respuesta no válida');
             const aportes = await response.json();
             if (!aportes.length) {
@@ -187,7 +188,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         seccion.replaceChildren();
         agregarTexto(seccion, 'h3', 'Estado de mis reportes');
         try {
-            const response = await fetch('http://localhost:3000/api/mis-aportes', { credentials: 'include' });
+            const response = await fetch(API_BASE + '/api/mis-aportes', { credentials: 'include' });
             if (!response.ok) return;
             const aportes = await response.json();
             if (!aportes.length) {
