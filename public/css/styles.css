@@ -1265,3 +1265,10 @@ body {
         font-size: 21px;
     }
 }
+
+
+/* Enlaces de navegación en la vista de revisión */
+body:has(.review-main) .nav-link {
+    font-weight: 700;
+    font-size: 15px;
+}
