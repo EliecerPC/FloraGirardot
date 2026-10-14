@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS usuario (
                                        nombre VARCHAR(100) NOT NULL,
                                        correo VARCHAR(150) UNIQUE NOT NULL,
                                        contrasena VARCHAR(255) NOT NULL,
-                                       rol VARCHAR(50) DEFAULT 'ciudadano', -- 'admin', 'investigador', 'ciudadano'
+                                       rol VARCHAR(50) DEFAULT 'ciudadano', -- 'ciudadano' (registro público), 'investigador' y 'admin' (cuentas autorizadas)
                                        estado VARCHAR(20) DEFAULT 'activo',
                                        fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -101,7 +101,7 @@ CREATE TABLE IF NOT EXISTS aporte (
                                       tipo VARCHAR(50) DEFAULT 'avistamiento', -- 'avistamiento', 'saber_local', 'foto'
                                       descripcion TEXT NOT NULL,
                                       fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                      estado VARCHAR(20) DEFAULT 'pendiente', -- 'pendiente', 'verificado', 'rechazado'
+                                      estado VARCHAR(20) DEFAULT 'pendiente', -- 'pendiente', 'verificado', 'rechazado', 'requiere_correccion'
                                       observaciones TEXT,
                                       CONSTRAINT fk_aporte_usuario FOREIGN KEY (id_usuario)
                                           REFERENCES usuario(id_usuario) ON DELETE CASCADE,

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crear cuenta - FloraGirardot</title>
+    <link rel="stylesheet" href="../public/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<header class="main-header">
+    <div class="header-container">
+        <a class="logo-group" href="index.html" style="text-decoration:none;color:inherit">
+            <img src="../public/assets/img/logo-floragirardot.svg" alt="FloraGirardot" class="logo-icon">
+            <span class="logo-title">FloraGirardot</span>
+        </a>
+        <nav class="nav-menu">
+            <a href="index.html" class="nav-link">Inicio</a>
+            <a href="catalogo.html" class="nav-link">Catálogo</a>
+            <a href="login.html" class="nav-link">Iniciar sesión</a>
+        </nav>
+    </div>
+</header>
+<main class="catalog-body" style="padding:3rem 5%;justify-content:center">
+    <section class="filters-sidebar" style="max-width:520px;width:100%;margin:0 auto;padding:2rem;border-radius:20px">
+        <h1 class="catalog-title">Únete a FloraGirardot</h1>
+        <p>Regístrate como ciudadano para compartir observaciones de la flora urbana.</p>
+        <form id="form-auth" data-mode="registro">
+            <label for="nombre">Nombre</label>
+            <input class="search-input" id="nombre" name="nombre" autocomplete="name" minlength="2" maxlength="100" required style="width:100%;margin:.5rem 0 1rem">
+            <label for="correo">Correo electrónico</label>
+            <input class="search-input" id="correo" name="correo" type="email" autocomplete="email" maxlength="150" required style="width:100%;margin:.5rem 0 1rem">
+            <label for="contrasena">Contraseña (mínimo 8 caracteres)</label>
+            <input class="search-input" id="contrasena" name="contrasena" type="password" autocomplete="new-password" minlength="8" maxlength="72" required style="width:100%;margin:.5rem 0 1rem">
+            <button type="submit" class="btn-card-white" style="background:#00b04f;color:white;border:0;padding:.8rem 1.5rem;border-radius:25px;cursor:pointer">Crear cuenta</button>
+        </form>
+        <p id="auth-mensaje" role="status" aria-live="polite"></p>
+        <p>¿Ya tienes cuenta? <a href="login.html">Inicia sesión</a>.</p>
+    </section>
+</main>
+<script src="../public/js/auth.js"></script>
+</body>
+</html>
