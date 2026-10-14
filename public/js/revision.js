@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    const API_BASE = 'http://' + (window.location.hostname || 'localhost') + ':3000';
     const mensaje = document.getElementById('mensaje-revision');
     const lista = document.getElementById('lista-revision');
 
@@ -11,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function cambiarEstado(id, estado) {
         try {
-            const response = await fetch('http://localhost:3000/api/admin/aportes/' + encodeURIComponent(id) + '/estado', {
+            const response = await fetch(API_BASE + '/api/admin/aportes/' + encodeURIComponent(id) + '/estado', {
                 method: 'PATCH',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
@@ -33,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function cargarReportes() {
         lista.replaceChildren();
         try {
-            const response = await fetch('http://localhost:3000/api/admin/aportes', { credentials: 'include' });
+            const response = await fetch(API_BASE + '/api/admin/aportes', { credentials: 'include' });
             const data = await response.json();
             if (!response.ok) {
                 mensaje.textContent = data.error || 'No tienes permiso para consultar esta sección.';
@@ -76,7 +77,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        const response = await fetch('http://localhost:3000/api/auth/me', { credentials: 'include' });
+        const response = await fetch(API_BASE + '/api/auth/me', { credentials: 'include' });
         if (!response.ok) {
             mensaje.textContent = 'Inicia sesión con una cuenta autorizada para acceder a esta sección.';
             return;
