@@ -23,13 +23,16 @@
             <a href="index.html" class="nav-link">Inicio</a>
             <a href="catalogo.html" class="nav-link">Catálogo</a>
             <a href="#acerca" class="nav-link">Acerca de</a>
-            <a href="catalogo.html" class="btn-buscar">Buscar</a>
+            <a href="login.html" class="nav-link">Iniciar sesión</a>
+            <a href="registro.html" class="btn-buscar">Crear cuenta</a>
         </nav>
     </div>
 </header>
 
 <!-- Layout Principal de Participación -->
 <main class="catalog-body" style="padding: 2rem 5%; gap: 2rem; align-items: start;">
+
+    <p id="sesion-info" role="status" aria-live="polite" style="grid-column:1/-1;margin:0 0 1rem"></p>
 
     <!-- Columna Izquierda: Título y Lista de Reportes -->
     <section style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
@@ -45,7 +48,7 @@
     </section>
 
     <!-- Columna Derecha: Formulario de Aporte -->
-    <section class="filters-sidebar" style="flex: 1.5; padding: 2rem; border-radius: 20px;">
+    <section id="formulario-aporte" class="filters-sidebar" style="flex: 1.5; padding: 2rem; border-radius: 20px;">
         <span class="group-label" style="margin-bottom: 1.5rem; display: block; font-size: 0.9rem;">FORMULARIO DE APORTE</span>
 
         <form id="form-aporte">
