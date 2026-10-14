@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const API_BASE = 'http://' + (window.location.hostname || 'localhost') + ':3000';
     const form = document.getElementById('form-auth');
     const mensaje = document.getElementById('auth-mensaje');
     if (!form || !mensaje) return;
@@ -17,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
         mensaje.textContent = 'Procesando…';
 
         try {
-            const response = await fetch('http://localhost:3000/api/auth/' + (mode === 'registro' ? 'registro' : 'login'), {
+            const response = await fetch(API_BASE + '/api/auth/' + (mode === 'registro' ? 'registro' : 'login'), {
                 method: 'POST',
                 credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
