@@ -24,17 +24,20 @@ CREATE TABLE IF NOT EXISTS especie (
 
 -- 3. Tabla: FICHA_TECNICA (Relación 1:1 con ESPECIE)
 CREATE TABLE IF NOT EXISTS ficha_tecnica (
-                                             id_ficha SERIAL PRIMARY KEY,
-                                             id_especie INT UNIQUE NOT NULL,
-                                             descripcion TEXT NOT NULL,
-                                             caracteristicas TEXT,
-                                             habitat TEXT,
-                                             distribucion TEXT,
-                                             importancia_ecologica TEXT,
-                                             conservacion VARCHAR(100),
-                                             actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                             CONSTRAINT fk_ficha_especie FOREIGN KEY (id_especie)
-                                                 REFERENCES especie(id_especie) ON DELETE CASCADE
+                                        id_ficha SERIAL PRIMARY KEY,
+                                        id_especie INT UNIQUE NOT NULL,
+                                        origen VARCHAR(100),                -- ej. 'Nativa', 'Introducida'
+                                        tipo_planta VARCHAR(100),           -- ej. 'Árbol', 'Arbusto', 'Palma'
+                                        rango_altitudinal VARCHAR(100),     -- ej. '0 - 1000 m s. n. m.'
+                                        descripcion TEXT NOT NULL,
+                                        caracteristicas TEXT,
+                                        habitat TEXT,
+                                        distribucion TEXT,
+                                        importancia_ecologica TEXT,
+                                        conservacion VARCHAR(100),
+                                        actualizacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                        CONSTRAINT fk_ficha_especie FOREIGN KEY (id_especie)
+                                        REFERENCES especie(id_especie) ON DELETE CASCADE
 );
 
 -- 4. Tabla: FOTOGRAFIA (Relación 1:N con ESPECIE)
