@@ -30,6 +30,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             const reader = new FileReader();
             reader.onload = (e) => {
+                if (mensajeFeedback) mensajeFeedback.textContent = '';
+                // Si el archivo no se puede mostrar como imagen, se descarta antes de enviarlo.
+                imgPreview.onerror = () => {
+                    imgPreview.removeAttribute('src');
+                    imgPreview.style.display = 'none';
+                    previewContainer.style.display = 'flex';
+                    inputImagen.value = '';
+                    if (mensajeFeedback) mensajeFeedback.textContent = 'El archivo no parece ser una imagen válida.';
+                };
                 imgPreview.src = e.target.result;
                 imgPreview.style.display = 'block';
                 previewContainer.style.display = 'none';
@@ -61,6 +70,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const data = await response.json();
             const usuario = data.usuario;
+            document.getElementById('nav-login')?.remove();
+            document.getElementById('nav-registro')?.remove();
             sesionInfo.textContent = 'Sesión iniciada como ' + usuario.nombre + ' (' + usuario.rol + '). ';
             const cerrar = document.createElement('button');
             cerrar.type = 'button';
