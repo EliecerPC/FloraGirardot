@@ -35,17 +35,22 @@ app.use(session({
 }));
 
 // Mantener disponible la carpeta de recursos públicos existente.
-app.use('/assets', express.static(path.join(__dirname, '../public/assets')));
+app.use('/assets', express.static(path.join(__dirname, '../public/assets'), {
+    setHeaders: res => res.setHeader('X-Content-Type-Options', 'nosniff')
+}));
 const imageDirectory = path.join(__dirname, '../public/assets/img');
 fs.mkdirSync(imageDirectory, { recursive: true });
+
+const EXTENSIONES = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
 
 const storage = multer.diskStorage({
     destination: (_req, _file, cb) => cb(null, imageDirectory),
     filename: (_req, file, cb) => {
-        const ext = path.extname(file.originalname).toLowerCase();
+        const ext = EXTENSIONES[file.mimetype];
         cb(null, 'aporte-' + Date.now() + '-' + Math.round(Math.random() * 1e9) + ext);
     }
 });
+
 const upload = multer({
     storage,
     limits: { fileSize: 5 * 1024 * 1024, files: 1 },
@@ -56,6 +61,25 @@ const upload = multer({
         cb(null, true);
     }
 });
+
+// Comprueba los primeros bytes del archivo: el mimetype lo declara el cliente y puede mentir.
+function firmaValida(rutaArchivo, mimetype) {
+    const buf = Buffer.alloc(12);
+    const fd = fs.openSync(rutaArchivo, 'r');
+    try {
+        fs.readSync(fd, buf, 0, 12, 0);
+    } finally {
+        fs.closeSync(fd);
+    }
+    if (mimetype === 'image/jpeg') return buf[0] === 0xFF && buf[1] === 0xD8 && buf[2] === 0xFF;
+    if (mimetype === 'image/png') {
+        return buf.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A]));
+    }
+    if (mimetype === 'image/webp') {
+        return buf.toString('ascii', 0, 4) === 'RIFF' && buf.toString('ascii', 8, 12) === 'WEBP';
+    }
+    return false;
+}
 
 // -------------------- Autenticación y permisos --------------------
 function requireAuth(req, res, next) {
@@ -212,6 +236,10 @@ app.post('/api/aportes', requireAuth, (req, res, next) => {
         next();
     });
 }, async (req, res) => {
+    if (req.file && !firmaValida(req.file.path, req.file.mimetype)) {
+        fs.unlink(req.file.path, () => {});
+        return res.status(400).json({ error: 'El archivo no es una imagen válida.' });
+    }
     const planta = String(req.body.planta || '').trim();
     const notas = String(req.body.notas || '').trim();
     const ubicacion = String(req.body.ubicacion || '').trim();
