@@ -1,15 +1,23 @@
-# WebStorm / JetBrains (Ignora toda la carpeta .idea)
+# Dependencias (se regeneran con "npm install")
+node_modules/
+
+# Entorno y credenciales (el .env.example sí se versiona)
+.env
+.env.*
+!.env.example
+
+# WebStorm / JetBrains
 .idea/
 
-# Entorno y credenciales
-.env
-.env.local
-.env.*.local
+# Fotos subidas por los usuarios (no son parte del código)
+uploads/
+public/assets/img/aporte-*
 
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db
 *.tmp
 
-# Archivos de logs
+# Logs
 *.log
+npm-debug.log*
