@@ -7,12 +7,26 @@ const bcrypt = require('bcryptjs');
 const path = require('path');
 const fs = require('fs');
 const pool = require('./db');
+const helmet = require('helmet');
+const { rateLimit } = require('express-rate-limit');
+const PgSession = require('connect-pg-simple')(session);
+
+// En producción no se permite arrancar con la clave de sesión por defecto.
+if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
+    console.error('Falta SESSION_SECRET en el .env. El servidor no arranca en producción sin ella.');
+    process.exit(1);
+}
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 const frontendOrigins = (process.env.FRONTEND_URL || 'http://127.0.0.1:5500,http://localhost:5500')
     .split(',').map(origin => origin.trim()).filter(Boolean);
 
+app.use(helmet({
+    // Las fotos se sirven desde el puerto 3000 y se muestran en páginas de otro origen (5500).
+    // Con el valor por defecto de helmet, el navegador las bloquearía.
+    crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
 app.use(cors({
     origin(origin, callback) {
         if (!origin || frontendOrigins.includes(origin)) return callback(null, true);
@@ -22,6 +36,7 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '1mb' }));
 app.use(session({
+    store: new PgSession({ pool, createTableIfMissing: true }),
     name: 'floragirardot.sid',
     secret: process.env.SESSION_SECRET || 'solo-desarrollo-cambiar-antes-de-publicar',
     resave: false,
@@ -81,6 +96,37 @@ function firmaValida(rutaArchivo, mimetype) {
     return false;
 }
 
+// -------------------- Límites de intentos --------------------
+const mensajeLimite = { error: 'Demasiados intentos. Inténtalo de nuevo en unos minutos.' };
+
+// Solo cuentan los intentos fallidos: 10 cada 15 minutos por IP.
+const limitarLogin = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 10,
+    skipSuccessfulRequests: true,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: mensajeLimite
+});
+
+// 10 cuentas nuevas por hora y por IP.
+const limitarRegistro = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 10,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: mensajeLimite
+});
+
+// 20 reportes con foto por hora y por IP (evita llenar el disco).
+const limitarSubidas = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 20,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: 'Has enviado demasiados reportes. Inténtalo más tarde.' }
+});
+
 // -------------------- Autenticación y permisos --------------------
 function requireAuth(req, res, next) {
     if (!req.session.user) return res.status(401).json({ error: 'Debes iniciar sesión para realizar esta acción.' });
@@ -95,7 +141,7 @@ function requireReviewer(req, res, next) {
 }
 
 // El registro público crea exclusivamente cuentas de ciudadano.
-app.post('/api/auth/registro', async (req, res) => {
+app.post('/api/auth/registro', limitarRegistro, async (req, res) => {
     const nombre = String(req.body.nombre || '').trim();
     const correo = String(req.body.correo || '').trim().toLowerCase();
     const contrasena = String(req.body.contrasena || '');
@@ -128,7 +174,7 @@ app.post('/api/auth/registro', async (req, res) => {
     }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', limitarLogin, async (req, res) => {
     const correo = String(req.body.correo || '').trim().toLowerCase();
     const contrasena = String(req.body.contrasena || '');
     try {
@@ -230,7 +276,7 @@ app.get('/api/mis-aportes', requireAuth, async (req, res) => {
 });
 
 // Autenticación antes de procesar cualquier archivo enviado.
-app.post('/api/aportes', requireAuth, (req, res, next) => {
+app.post('/api/aportes', limitarSubidas, requireAuth, (req, res, next) => {
     upload.single('imagen')(req, res, err => {
         if (err) return res.status(400).json({ error: err.message || 'No fue posible procesar la imagen.' });
         next();
@@ -309,6 +355,6 @@ app.use((err, _req, res, _next) => {
 app.listen(PORT, () => {
     console.log('Servidor corriendo en http://localhost:' + PORT);
     if (!process.env.SESSION_SECRET) {
-        console.warn('...');
+        console.warn('AVISO: falta SESSION_SECRET en el .env; se usa una clave de desarrollo.');
     }
 });
