@@ -223,7 +223,20 @@ app.post('/api/auth/logout', (req, res) => {
 // -------------------- Consulta pública de especies --------------------
 app.get('/api/especies', async (_req, res) => {
     try {
-        const query = "SELECT e.id_especie, e.nombre_comun, e.nombre_cientifico, e.familia, ft.origen, ft.tipo_planta, ft.habitat, COALESCE(f.ruta, '../assets/img/acacia-card.jpg') AS ruta FROM especie e LEFT JOIN ficha_tecnica ft ON e.id_especie = ft.id_especie LEFT JOIN fotografia f ON e.id_especie = f.id_especie AND f.tipo = 'general' WHERE LOWER(e.estado) = 'activo'";
+        const query = `
+            SELECT e.id_especie, e.nombre_comun, e.nombre_cientifico, e.familia,
+                   ft.origen, ft.tipo_planta, ft.habitat,
+                   COALESCE(f.ruta, '../public/assets/img/acacia-card.jpg') AS ruta
+            FROM especie e
+            LEFT JOIN ficha_tecnica ft ON ft.id_especie = e.id_especie
+            LEFT JOIN LATERAL (
+                SELECT ruta FROM fotografia
+                WHERE id_especie = e.id_especie AND tipo = 'general'
+                ORDER BY id_fotografia
+                LIMIT 1
+            ) f ON TRUE
+            WHERE LOWER(e.estado) = 'activo'
+            ORDER BY e.nombre_comun`;
         const result = await pool.query(query);
         res.json(result.rows);
     } catch (err) {
@@ -236,7 +249,20 @@ app.get('/api/especies/:id', async (req, res) => {
     const id = req.params.id;
     if (!/^\d+$/.test(id)) return res.status(400).json({ error: 'Identificador inválido.' });
     try {
-        const especieQuery = "SELECT e.id_especie, e.nombre_comun, e.nombre_cientifico, e.familia, e.genero, ft.origen, ft.tipo_planta, ft.rango_altitudinal, ft.descripcion, ft.caracteristicas, ft.habitat, ft.distribucion, ft.importancia_ecologica, f.ruta FROM especie e LEFT JOIN ficha_tecnica ft ON e.id_especie = ft.id_especie LEFT JOIN fotografia f ON e.id_especie = f.id_especie AND f.tipo = 'general' WHERE e.id_especie = $1";
+        const especieQuery = `
+            SELECT e.id_especie, e.nombre_comun, e.nombre_cientifico, e.familia, e.genero,
+                   ft.origen, ft.tipo_planta, ft.rango_altitudinal, ft.descripcion,
+                   ft.caracteristicas, ft.habitat, ft.distribucion, ft.importancia_ecologica,
+                   f.ruta
+            FROM especie e
+            LEFT JOIN ficha_tecnica ft ON ft.id_especie = e.id_especie
+            LEFT JOIN LATERAL (
+                SELECT ruta FROM fotografia
+                WHERE id_especie = e.id_especie AND tipo = 'general'
+                ORDER BY id_fotografia
+                LIMIT 1
+            ) f ON TRUE
+            WHERE e.id_especie = $1 AND LOWER(e.estado) = 'activo'`;
         const [especie, ubicaciones] = await Promise.all([
             pool.query(especieQuery, [id]),
             pool.query('SELECT sector, direccion_coordenadas FROM ubicacion WHERE id_especie = $1', [id])
