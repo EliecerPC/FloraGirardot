@@ -39,6 +39,11 @@ Proyecto de impacto ecológico y social: catálogo digital de la flora de Girard
    psql -U postgres -c "CREATE DATABASE flora_girardot;"
    psql -U postgres -d flora_girardot -f database/schema.sql
    ```
+   Opcional, para cargar 5 especies de ejemplo:
+
+   ```bash
+   npm run db:seed
+   ```
 
 3. Copia `.env.example` como `.env` y completa los valores (contraseña de la base de datos y `SESSION_SECRET`).
 
@@ -73,16 +78,23 @@ UPDATE usuario SET rol = 'admin' WHERE correo = 'correo@ejemplo.com';
 ## Estructura del proyecto
 
 ```
-database/   Esquema SQL de PostgreSQL
-public/     CSS, JavaScript del frontend e imágenes
-server/     API Express (index.js) y conexión a la base (db.js)
-views/      Páginas HTML
+database/     Esquema SQL, datos de ejemplo (seed.sql) y migraciones
+public/       CSS, JavaScript del frontend e imágenes del sitio
+scripts/      Utilidades: seed.js, migrar.js y set-rol.js
+server/       API Express (index.js) y conexión a la base (db.js)
+uploads/      Fotos de los reportes (privadas, no se versionan)
+views/        Páginas HTML
 ```
+
+Si ya tenías una base creada con una versión anterior del esquema, aplica las migraciones con `npm run db:migrar`.
 
 ## Seguridad
 
 - Nunca subas el archivo `.env` al repositorio.
-- En producción define un `SESSION_SECRET` propio y usa `NODE_ENV=production` (activa cookies seguras).
+- Las fotos de los reportes no son públicas: solo se muestran si el reporte está aprobado, o a su autor y a los revisores.
+- Inicio de sesión, registro y envío de reportes tienen límite de intentos por IP.
+- Las sesiones se guardan en PostgreSQL.
+- En producción define un `SESSION_SECRET` propio y usa `NODE_ENV=production` (activa cookies seguras). Si el sitio queda detrás de un proxy, agrega `app.set('trust proxy', 1);` en `server/index.js`.
 
 ## Licencia
 

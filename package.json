@@ -1,10 +1,14 @@
 {
   "name": "floragirardot",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Catálogo digital de la flora de Girardot con reportes ciudadanos revisados por investigadores.",
+  "main": "server/index.js",
   "scripts": {
     "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "web": "npx live-server --port=5500 --open=/views/index.html --watch=views,public/css,public/js",
+    "db:seed": "node scripts/seed.js",
+    "db:migrar": "node scripts/migrar.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
