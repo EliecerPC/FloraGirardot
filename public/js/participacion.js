@@ -9,6 +9,38 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inputImagen = document.getElementById('input-imagen');
     const imgPreview = document.getElementById('img-preview');
     const previewContainer = document.getElementById('preview-container');
+    const selectEspecie = document.getElementById('select-especie');
+    const inputPlanta = document.getElementById('input-planta');
+
+    // Rellena la lista con las especies del catálogo.
+    async function cargarEspecies() {
+        if (!selectEspecie) return;
+        try {
+            const response = await fetch(API_BASE + '/api/especies');
+            if (!response.ok) return;
+            const especies = await response.json();
+            const opcionOtra = selectEspecie.querySelector('option[value="otra"]');
+            especies.forEach(especie => {
+                const opcion = document.createElement('option');
+                opcion.value = String(especie.id_especie);
+                opcion.textContent = especie.nombre_comun + ' (' + especie.nombre_cientifico + ')';
+                selectEspecie.insertBefore(opcion, opcionOtra);
+            });
+        } catch (error) {
+            console.error('No se pudo cargar la lista de especies:', error);
+        }
+    }
+
+    // El campo de texto solo aparece (y es obligatorio) con "Otra planta".
+    function actualizarCampoPlanta() {
+        if (!selectEspecie || !inputPlanta) return;
+        const esOtra = selectEspecie.value === 'otra';
+        inputPlanta.style.display = esOtra ? 'block' : 'none';
+        inputPlanta.required = esOtra;
+        if (!esOtra) inputPlanta.value = '';
+    }
+
+    if (selectEspecie) selectEspecie.addEventListener('change', actualizarCampoPlanta);
 
     if (dropArea && inputImagen) {
         dropArea.addEventListener('click', () => inputImagen.click());
@@ -107,7 +139,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         formAporte.addEventListener('submit', async (event) => {
             event.preventDefault();
             const formData = new FormData();
-            formData.append('planta', document.getElementById('input-planta').value.trim());
+            if (selectEspecie.value === 'otra') {
+                formData.append('planta', inputPlanta.value.trim());
+            } else {
+                formData.append('id_especie', selectEspecie.value);
+            }
             formData.append('ubicacion', document.getElementById('input-ubicacion').value.trim());
             formData.append('notas', document.getElementById('input-notas').value.trim());
             if (inputImagen.files[0]) formData.append('imagen', inputImagen.files[0]);
@@ -125,6 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     mensajeFeedback.style.color = '#00883d';
                     mensajeFeedback.textContent = data.mensaje || 'Reporte enviado para revisión.';
                     formAporte.reset();
+                    actualizarCampoPlanta();
                     imgPreview.style.display = 'none';
                     imgPreview.removeAttribute('src');
                     previewContainer.style.display = 'flex';
@@ -206,6 +243,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         agregarTexto(contenido, 'p', 'Nombre de la planta: ' + nombrePlanta);
         agregarTexto(contenido, 'p', 'Sector o ubicación: ' + ubicacion);
+        if (aporte.id_especie) {
+            const enlace = document.createElement('a');
+            enlace.href = 'ficha.html?id=' + encodeURIComponent(aporte.id_especie);
+            enlace.textContent = 'Ver la ficha de esta especie en el catálogo';
+            enlace.style.cssText = 'display: inline-block; margin: 6px 0 10px; color: #00883d; font-weight: 600;';
+            contenido.appendChild(enlace);
+        }
         agregarTexto(contenido, 'p', 'Observaciones: ' + (notas || 'Sin observaciones'));
 
 
@@ -428,7 +472,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Error al consultar mis reportes:', error);
         }
     }
-
+    await cargarEspecies();
     await comprobarSesion();
     await cargarAportes();
     if (formularioAporte && formularioAporte.style.display !== 'none') {

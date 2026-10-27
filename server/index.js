@@ -281,7 +281,7 @@ app.get('/api/especies/:id', async (req, res) => {
 app.get('/api/aportes', async (_req, res) => {
     try {
         const result = await pool.query(
-            `SELECT a.id_aporte, a.planta, a.ubicacion, a.notas,
+            `SELECT a.id_aporte, a.id_especie, a.planta, a.ubicacion, a.notas,
                     (a.foto IS NOT NULL) AS tiene_foto, a.fecha_envio, u.nombre AS autor
              FROM aporte a
              JOIN usuario u ON u.id_usuario = a.id_usuario
@@ -299,7 +299,7 @@ app.get('/api/aportes', async (_req, res) => {
 app.get('/api/mis-aportes', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
-            `SELECT id_aporte, planta, ubicacion, notas,
+            `SELECT id_aporte, id_especie, planta, ubicacion, notas,
                     (foto IS NOT NULL) AS tiene_foto, fecha_envio, estado
              FROM aporte
              WHERE id_usuario = $1
@@ -353,31 +353,59 @@ app.post('/api/aportes', limitarSubidas, requireAuth, (req, res, next) => {
         next();
     });
 }, async (req, res) => {
+    const descartarArchivo = () => {
+        if (req.file) fs.unlink(req.file.path, () => {});
+    };
+
     if (req.file && !firmaValida(req.file.path, req.file.mimetype)) {
-        fs.unlink(req.file.path, () => {});
+        descartarArchivo();
         return res.status(400).json({ error: 'El archivo no es una imagen válida.' });
     }
-    const planta = String(req.body.planta || '').trim();
+
+    const idEspecieTexto = String(req.body.id_especie || '').trim();
     const notas = String(req.body.notas || '').trim();
     const ubicacion = String(req.body.ubicacion || '').trim();
-    if (!planta || !ubicacion) {
-        if (req.file) fs.unlink(req.file.path, () => {});
-        return res.status(400).json({ error: 'El nombre de la planta y la ubicación son obligatorios.' });
-    }
-    if (planta.length > 150 || ubicacion.length > 250 || notas.length > 5000) {
-        if (req.file) fs.unlink(req.file.path, () => {});
-        return res.status(400).json({ error: 'Uno de los campos supera la longitud permitida.' });
-    }
+    let planta = String(req.body.planta || '').trim();
+    let idEspecie = null;
+
     try {
+        // Si eligió una especie del catálogo, el nombre sale de la base de datos, no del formulario.
+        if (idEspecieTexto) {
+            if (!/^\d{1,9}$/.test(idEspecieTexto)) {
+                descartarArchivo();
+                return res.status(400).json({ error: 'La especie seleccionada no es válida.' });
+            }
+            const especie = await pool.query(
+                "SELECT id_especie, nombre_comun FROM especie WHERE id_especie = $1 AND LOWER(estado) = 'activo'",
+                [idEspecieTexto]
+            );
+            if (!especie.rows.length) {
+                descartarArchivo();
+                return res.status(400).json({ error: 'La especie seleccionada no existe.' });
+            }
+            idEspecie = especie.rows[0].id_especie;
+            planta = especie.rows[0].nombre_comun;
+        }
+
+        if (!planta || !ubicacion) {
+            descartarArchivo();
+            return res.status(400).json({ error: 'El nombre de la planta y la ubicación son obligatorios.' });
+        }
+        if (planta.length > 150 || ubicacion.length > 250 || notas.length > 5000) {
+            descartarArchivo();
+            return res.status(400).json({ error: 'Uno de los campos supera la longitud permitida.' });
+        }
+
         const result = await pool.query(
-            `INSERT INTO aporte (id_usuario, planta, ubicacion, notas, foto, estado)
-             VALUES ($1, $2, $3, $4, $5, 'pendiente')
-             RETURNING id_aporte, planta, ubicacion, notas, (foto IS NOT NULL) AS tiene_foto, fecha_envio, estado`,
-            [req.session.user.id_usuario, planta, ubicacion, notas || null, req.file ? req.file.filename : null]
+            `INSERT INTO aporte (id_usuario, id_especie, planta, ubicacion, notas, foto, estado)
+             VALUES ($1, $2, $3, $4, $5, $6, 'pendiente')
+                 RETURNING id_aporte, id_especie, planta, ubicacion, notas,
+                       (foto IS NOT NULL) AS tiene_foto, fecha_envio, estado`,
+            [req.session.user.id_usuario, idEspecie, planta, ubicacion, notas || null, req.file ? req.file.filename : null]
         );
         res.status(201).json({ mensaje: 'Reporte enviado. Quedará pendiente de revisión.', aporte: result.rows[0] });
     } catch (err) {
-        if (req.file) fs.unlink(req.file.path, () => {});
+        descartarArchivo();
         console.error('Error al guardar aporte:', err);
         res.status(500).json({ error: 'Error al guardar el reporte.' });
     }
@@ -387,10 +415,13 @@ app.post('/api/aportes', limitarSubidas, requireAuth, (req, res, next) => {
 app.get('/api/admin/aportes', requireReviewer, async (_req, res) => {
     try {
         const result = await pool.query(
-            `SELECT a.id_aporte, a.planta, a.ubicacion, a.notas, (a.foto IS NOT NULL) AS tiene_foto,
-                    a.fecha_envio, a.estado, u.nombre AS autor, u.correo AS correo_autor
+            `SELECT a.id_aporte, a.id_especie, a.planta, a.ubicacion, a.notas,
+                    (a.foto IS NOT NULL) AS tiene_foto, a.fecha_envio, a.estado,
+                    e.nombre_cientifico AS especie_catalogo,
+                    u.nombre AS autor, u.correo AS correo_autor
              FROM aporte a
-             JOIN usuario u ON u.id_usuario = a.id_usuario
+                      JOIN usuario u ON u.id_usuario = a.id_usuario
+                      LEFT JOIN especie e ON e.id_especie = a.id_especie
              ORDER BY a.fecha_envio DESC`
         );
         res.json(result.rows);

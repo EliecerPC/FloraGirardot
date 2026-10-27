@@ -133,6 +133,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             'review-dialog-text'
         );
 
+        if (aporte.especie_catalogo) {
+            agregarTexto(
+                dialogoContenido,
+                'p',
+                'Especie del catálogo: ' + aporte.especie_catalogo,
+                'review-detail'
+            );
+        }
+
         agregarTexto(
             dialogoContenido,
             'h3',
