@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         agregarTexto(
             dialogoContenido,
             'h2',
-            aporte.descripcion || 'Reporte sin descripción',
+            aporte.planta || 'Reporte sin identificar',
             'review-dialog-title'
         );
 
@@ -122,27 +122,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         agregarTexto(
             dialogoContenido,
             'h3',
-            'Descripción completa',
+            'Ubicación reportada',
             'review-dialog-subtitle'
         );
 
         agregarTexto(
             dialogoContenido,
             'p',
-            aporte.descripcion || 'Sin descripción disponible.',
+            aporte.ubicacion || 'No se indicó ubicación.',
             'review-dialog-text'
         );
-
-        // Extraer la fotografía si está guardada en las observaciones.
-        const observaciones = aporte.observaciones || '';
-        const coincidenciaFoto = observaciones.match(
-            /Foto:\s*(.+?)(?=\s*\|\s*|$)/i
-        );
-
-        const textoObservaciones = observaciones
-            .replace(/\s*\|\s*Foto:\s*.+?(?=\s*\|\s*|$)/i, '')
-            .replace(/^\s*\|\s*|\s*\|\s*$/g, '')
-            .trim();
 
         agregarTexto(
             dialogoContenido,
@@ -154,11 +143,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         agregarTexto(
             dialogoContenido,
             'p',
-            textoObservaciones || 'No se registraron observaciones adicionales.',
+            aporte.notas || 'No se registraron observaciones adicionales.',
             'review-dialog-text'
         );
 
-        if (coincidenciaFoto) {
+        if (aporte.tiene_foto) {
             agregarTexto(
                 dialogoContenido,
                 'h3',
@@ -168,7 +157,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const imagen = document.createElement('img');
             imagen.className = 'review-dialog-image';
-            imagen.src = coincidenciaFoto[1].trim();
+            imagen.src = API_BASE + '/api/aportes/' + aporte.id_aporte + '/foto';
             imagen.alt = 'Fotografía adjunta al aporte';
 
             imagen.addEventListener('error', () => {
@@ -177,7 +166,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 agregarTexto(
                     dialogoContenido,
                     'p',
-                    'No se pudo cargar la fotografía. Verifica la ruta del archivo.',
+                    'No se pudo cargar la fotografía.',
                     'review-detail'
                 );
             }, { once: true });
@@ -269,7 +258,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 agregarTexto(
                     header,
                     'h2',
-                    aporte.descripcion || 'Reporte sin descripción',
+                    aporte.planta || 'Reporte sin identificar',
                     'review-card-title'
                 );
 
@@ -322,8 +311,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                 agregarTexto(
                     details,
                     'p',
-                    'Observaciones: ' +
-                    (aporte.observaciones || 'Sin observaciones'),
+                    'Ubicación: ' + (aporte.ubicacion || 'No especificada'),
+                    'review-detail'
+                );
+
+                agregarTexto(
+                    details,
+                    'p',
+                    'Observaciones: ' + (aporte.notas || 'Sin observaciones'),
                     'review-observations'
                 );
 

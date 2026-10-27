@@ -53,7 +53,9 @@ app.use(session({
 app.use('/assets', express.static(path.join(__dirname, '../public/assets'), {
     setHeaders: res => res.setHeader('X-Content-Type-Options', 'nosniff')
 }));
-const imageDirectory = path.join(__dirname, '../public/assets/img');
+
+// Las fotos de reportes van fuera de public/: solo se entregan por /api/aportes/:id/foto.
+const imageDirectory = path.join(__dirname, '../uploads/aportes');
 fs.mkdirSync(imageDirectory, { recursive: true });
 
 const EXTENSIONES = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' };
@@ -279,7 +281,13 @@ app.get('/api/especies/:id', async (req, res) => {
 app.get('/api/aportes', async (_req, res) => {
     try {
         const result = await pool.query(
-            "SELECT a.id_aporte, a.descripcion, a.observaciones, a.fecha_envio, u.nombre AS autor FROM aporte a JOIN usuario u ON u.id_usuario = a.id_usuario WHERE a.estado = 'verificado' ORDER BY a.fecha_envio DESC LIMIT 50"
+            `SELECT a.id_aporte, a.planta, a.ubicacion, a.notas,
+                    (a.foto IS NOT NULL) AS tiene_foto, a.fecha_envio, u.nombre AS autor
+             FROM aporte a
+             JOIN usuario u ON u.id_usuario = a.id_usuario
+             WHERE a.estado = 'verificado'
+             ORDER BY a.fecha_envio DESC
+             LIMIT 50`
         );
         res.json(result.rows);
     } catch (err) {
@@ -291,13 +299,50 @@ app.get('/api/aportes', async (_req, res) => {
 app.get('/api/mis-aportes', requireAuth, async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT id_aporte, descripcion, observaciones, fecha_envio, estado FROM aporte WHERE id_usuario = $1 ORDER BY fecha_envio DESC',
+            `SELECT id_aporte, planta, ubicacion, notas,
+                    (foto IS NOT NULL) AS tiene_foto, fecha_envio, estado
+             FROM aporte
+             WHERE id_usuario = $1
+             ORDER BY fecha_envio DESC`,
             [req.session.user.id_usuario]
         );
         res.json(result.rows);
     } catch (err) {
         console.error('Error al consultar reportes del usuario:', err);
         res.status(500).json({ error: 'Error al cargar tus reportes.' });
+    }
+});
+
+// Entrega la foto de un reporte: pública si está aprobado; si no, solo su autor o un revisor.
+app.get('/api/aportes/:id/foto', async (req, res) => {
+    const id = req.params.id;
+    if (!/^\d+$/.test(id)) return res.status(400).json({ error: 'Identificador inválido.' });
+    try {
+        const result = await pool.query(
+            'SELECT id_usuario, estado, foto FROM aporte WHERE id_aporte = $1',
+            [id]
+        );
+        const aporte = result.rows[0];
+        // Se valida el nombre del archivo para impedir rutas como "../../.env".
+        if (!aporte || !aporte.foto || !/^aporte-\d+-\d+\.(jpe?g|png|webp)$/.test(aporte.foto)) {
+            return res.status(404).json({ error: 'Fotografía no encontrada.' });
+        }
+        const publica = aporte.estado === 'verificado';
+        if (!publica) {
+            const usuario = req.session.user;
+            const esAutor = usuario && usuario.id_usuario === aporte.id_usuario;
+            const esRevisor = usuario && ['admin', 'investigador'].includes(usuario.rol);
+            if (!esAutor && !esRevisor) {
+                return res.status(404).json({ error: 'Fotografía no encontrada.' });
+            }
+        }
+        res.setHeader('Cache-Control', publica ? 'public, max-age=600' : 'private, no-store');
+        res.sendFile(path.join(imageDirectory, aporte.foto), err => {
+            if (err && !res.headersSent) res.status(404).json({ error: 'Fotografía no encontrada.' });
+        });
+    } catch (err) {
+        console.error('Error al entregar la fotografía:', err);
+        res.status(500).json({ error: 'No se pudo cargar la fotografía.' });
     }
 });
 
@@ -323,13 +368,12 @@ app.post('/api/aportes', limitarSubidas, requireAuth, (req, res, next) => {
         if (req.file) fs.unlink(req.file.path, () => {});
         return res.status(400).json({ error: 'Uno de los campos supera la longitud permitida.' });
     }
-    const rutaImagen = req.file ? '../assets/img/' + req.file.filename : '';
-    const descripcion = 'Especie: ' + planta + ' | Sector: ' + ubicacion;
-    const observaciones = [notas || 'Sin notas', rutaImagen ? 'Foto: ' + rutaImagen : ''].filter(Boolean).join(' | ');
     try {
         const result = await pool.query(
-            "INSERT INTO aporte (id_usuario, descripcion, observaciones, estado) VALUES ($1, $2, $3, 'pendiente') RETURNING id_aporte, descripcion, observaciones, fecha_envio, estado",
-            [req.session.user.id_usuario, descripcion, observaciones]
+            `INSERT INTO aporte (id_usuario, planta, ubicacion, notas, foto, estado)
+             VALUES ($1, $2, $3, $4, $5, 'pendiente')
+             RETURNING id_aporte, planta, ubicacion, notas, (foto IS NOT NULL) AS tiene_foto, fecha_envio, estado`,
+            [req.session.user.id_usuario, planta, ubicacion, notas || null, req.file ? req.file.filename : null]
         );
         res.status(201).json({ mensaje: 'Reporte enviado. Quedará pendiente de revisión.', aporte: result.rows[0] });
     } catch (err) {
@@ -343,7 +387,11 @@ app.post('/api/aportes', limitarSubidas, requireAuth, (req, res, next) => {
 app.get('/api/admin/aportes', requireReviewer, async (_req, res) => {
     try {
         const result = await pool.query(
-            'SELECT a.id_aporte, a.descripcion, a.observaciones, a.fecha_envio, a.estado, u.nombre AS autor, u.correo AS correo_autor FROM aporte a JOIN usuario u ON u.id_usuario = a.id_usuario ORDER BY a.fecha_envio DESC'
+            `SELECT a.id_aporte, a.planta, a.ubicacion, a.notas, (a.foto IS NOT NULL) AS tiene_foto,
+                    a.fecha_envio, a.estado, u.nombre AS autor, u.correo AS correo_autor
+             FROM aporte a
+             JOIN usuario u ON u.id_usuario = a.id_usuario
+             ORDER BY a.fecha_envio DESC`
         );
         res.json(result.rows);
     } catch (err) {

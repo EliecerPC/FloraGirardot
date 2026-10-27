@@ -196,54 +196,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         contenido.appendChild(cerrar);
 
 
-        const descripcion = aporte.descripcion || '';
-        const campos = descripcion.split('|');
+        const nombrePlanta = aporte.planta || 'Planta sin identificar';
+        const ubicacion = aporte.ubicacion || 'No especificado';
+        const notas = aporte.notas || '';
 
-        const nombrePlanta = campos
-            .find(campo => /Especie:/i.test(campo))
-            ?.replace(/Especie:/i, '')
-            .trim() || 'Planta sin identificar';
-
-        const ubicacion = campos
-            .find(campo => /Sector:/i.test(campo))
-            ?.replace(/Sector:/i, '')
-            .trim() || 'No especificado';
-
-        const titulo = agregarTexto(
-            contenido,
-            'h2',
-            nombrePlanta
-        );
-
+        const titulo = agregarTexto(contenido, 'h2', nombrePlanta);
         titulo.id = 'titulo-detalle-aporte';
         titulo.style.margin = '15px 0';
 
-        agregarTexto(
-            contenido,
-            'p',
-            'Nombre de la planta: ' + nombrePlanta
-        );
-
-        agregarTexto(
-            contenido,
-            'p',
-            'Sector o ubicación: ' + ubicacion
-        );
-
-
-        const observaciones = aporte.observaciones || '';
-        const partes = observaciones.split(' | ');
-
-        const notas = partes
-            .filter(parte => !/^\s*Foto:/i.test(parte))
-            .join(' | ')
-            .trim();
-
-        agregarTexto(
-            contenido,
-            'p',
-            'Observaciones: ' + (notas || 'Sin observaciones')
-        );
+        agregarTexto(contenido, 'p', 'Nombre de la planta: ' + nombrePlanta);
+        agregarTexto(contenido, 'p', 'Sector o ubicación: ' + ubicacion);
+        agregarTexto(contenido, 'p', 'Observaciones: ' + (notas || 'Sin observaciones'));
 
 
         if (aporte.autor) {
@@ -278,24 +241,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             );
         }
 
-        // Extraer el nombre de archivo de la ruta guardada en observaciones.
-        const coincidencia = observaciones.match(
-            /Foto:\s*(?:\.\.\/assets\/img\/|\/assets\/img\/|assets\/img\/)?([^/\\\s|]+\.(?:jpg|jpeg|png|webp))/i
-        );
-
-        if (coincidencia) {
+        if (aporte.tiene_foto) {
             const imagen = document.createElement('img');
-            imagen.src = API_BASE + '/assets/img/' + coincidencia[1];
+            imagen.src = API_BASE + '/api/aportes/' + aporte.id_aporte + '/foto';
             imagen.alt = 'Fotografía del aporte';
             imagen.style.cssText = `
-            display: block;
-            width: 100%;
-            max-height: 400px;
-            object-fit: contain;
-            margin-top: 20px;
-            border-radius: 12px;
-            background: white;
-        `;
+                display: block;
+                width: 100%;
+                max-height: 400px;
+                object-fit: contain;
+                margin-top: 20px;
+                border-radius: 12px;
+                background: white;
+            `;
 
             imagen.addEventListener('error', () => {
                 imagen.alt = 'No se pudo cargar la fotografía.';
@@ -357,25 +315,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     color: #244b35;
                 `;
 
-                // Obtener el nombre de la planta
-                const coincidencia = aporte.descripcion.match(
-                    /Especie:\s*(.*?)(?:\s*\|\s*Sector:|$)/i
-                );
-
-                const nombrePlanta = coincidencia
-                    ? coincidencia[1].trim()
-                    : aporte.descripcion;
-
-                // Obtener la fotografía subida por el usuario
-                const coincidenciaFoto = aporte.observaciones?.match(
-                    /Foto:\s*(?:\.\.\/assets\/img\/|\/assets\/img\/|assets\/img\/)?([^/\\\s|]+\.(?:jpg|jpeg|png|webp))/i
-                );
+                const nombrePlanta = aporte.planta || 'Planta sin identificar';
 
                 const imagen = document.createElement('img');
-
-                imagen.src = coincidenciaFoto
-                    ? `${API_BASE}/assets/img/${coincidenciaFoto[1]}`
-                    : '../public/assets/img/acacia-card.jpg';
+                if (aporte.tiene_foto) {
+                    imagen.src = `${API_BASE}/api/aportes/${aporte.id_aporte}/foto`;
+                }
 
                 imagen.alt = `Fotografía de ${nombrePlanta}`;
 
@@ -405,7 +350,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     color: #587261;
                 `;
 
-                tarjeta.appendChild(imagen);
+                if (aporte.tiene_foto) tarjeta.appendChild(imagen);
                 tarjeta.appendChild(titulo);
                 tarjeta.appendChild(autor);
 
@@ -455,7 +400,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const boton = document.createElement('button');
                 boton.type = 'button';
                 boton.textContent =
-                    (aporte.descripcion || 'Reporte') + ' — ' +
+                    (aporte.planta || 'Reporte') + (aporte.ubicacion ? ' (' + aporte.ubicacion + ')' : '') + ' — ' +
                     (estados[aporte.estado] || aporte.estado) +
                     ' · Ver detalle';
 

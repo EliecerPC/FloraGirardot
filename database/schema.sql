@@ -98,16 +98,18 @@ CREATE TABLE IF NOT EXISTS ubicacion (
 
 -- 9. Tabla: APORTE (Relación N:1 con USUARIO y ESPECIE)
 CREATE TABLE IF NOT EXISTS aporte (
-                                      id_aporte SERIAL PRIMARY KEY,
-                                      id_usuario INT NOT NULL,
-                                      id_especie INT,
-                                      tipo VARCHAR(50) DEFAULT 'avistamiento', -- 'avistamiento', 'saber_local', 'foto'
-                                      descripcion TEXT NOT NULL,
-                                      fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                                      estado VARCHAR(20) DEFAULT 'pendiente', -- 'pendiente', 'verificado', 'rechazado', 'requiere_correccion'
-                                      observaciones TEXT,
-                                      CONSTRAINT fk_aporte_usuario FOREIGN KEY (id_usuario)
-                                          REFERENCES usuario(id_usuario) ON DELETE CASCADE,
-                                      CONSTRAINT fk_aporte_especie FOREIGN KEY (id_especie)
-                                          REFERENCES especie(id_especie) ON DELETE SET NULL
+                                        id_aporte SERIAL PRIMARY KEY,
+                                        id_usuario INT NOT NULL,
+                                        id_especie INT,
+                                        tipo VARCHAR(50) DEFAULT 'avistamiento', -- 'avistamiento', 'saber_local', 'foto'
+                                        planta VARCHAR(150) NOT NULL,
+                                        ubicacion VARCHAR(250) NOT NULL,
+                                        notas TEXT,
+                                        foto VARCHAR(100),                       -- nombre del archivo en uploads/aportes/
+                                        fecha_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                        estado VARCHAR(20) DEFAULT 'pendiente',  -- 'pendiente', 'verificado', 'rechazado', 'requiere_correccion'
+                                        CONSTRAINT fk_aporte_usuario FOREIGN KEY (id_usuario)
+                                            REFERENCES usuario(id_usuario) ON DELETE CASCADE,
+                                        CONSTRAINT fk_aporte_especie FOREIGN KEY (id_especie)
+                                            REFERENCES especie(id_especie) ON DELETE SET NULL
 );
