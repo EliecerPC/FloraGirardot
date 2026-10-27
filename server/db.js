@@ -11,4 +11,9 @@ const pool = new Pool({
     port: Number(process.env.DB_PORT || 5432),
 });
 
+// Sin este manejador, una caída de la conexión con PostgreSQL cerraría todo el servidor.
+pool.on('error', err => {
+    console.error('Error inesperado en la conexión con PostgreSQL:', err.message);
+});
+
 module.exports = pool;

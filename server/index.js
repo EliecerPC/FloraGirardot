@@ -451,10 +451,30 @@ app.patch('/api/admin/aportes/:id/estado', requireReviewer, async (req, res) => 
     }
 });
 
-app.use((err, _req, res, _next) => {
-    console.error('Error del servidor:', err.message);
+// Cualquier ruta que no exista responde en JSON, igual que el resto de la API.
+app.use((_req, res) => {
+    res.status(404).json({ error: 'Ruta no encontrada.' });
+});
+
+// Manejador central: distingue errores del usuario de fallos internos del servidor.
+app.use((err, req, res, _next) => {
     if (res.headersSent) return;
-    res.status(400).json({ error: 'No fue posible procesar la solicitud.' });
+
+    if (err.message === 'Origen no permitido por CORS') {
+        return res.status(403).json({ error: 'Origen no permitido.' });
+    }
+
+    // Errores del cliente (JSON mal formado, cuerpo demasiado grande, etc.)
+    const status = err.status || err.statusCode || 500;
+    if (status >= 400 && status < 500) {
+        console.warn('Solicitud rechazada (' + status + '):', err.message);
+        const mensajes = { 413: 'La solicitud es demasiado grande.' };
+        return res.status(status).json({ error: mensajes[status] || 'No fue posible procesar la solicitud.' });
+    }
+
+    // Fallos internos: el detalle queda en el registro del servidor, no se muestra al público.
+    console.error('Error interno en ' + req.method + ' ' + req.originalUrl + ':', err);
+    res.status(500).json({ error: 'Error interno del servidor. Inténtalo de nuevo más tarde.' });
 });
 
 app.listen(PORT, () => {
