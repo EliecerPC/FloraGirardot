@@ -1,48 +1,53 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const especieId = urlParams.get('id');
+    const API_BASE = 'http://' + (window.location.hostname || 'localhost') + ':3000';
+    const titleBadge = document.querySelector('.species-title-badge');
+    const especieId = new URLSearchParams(window.location.search).get('id');
 
     if (!especieId) {
-        document.querySelector('.species-title-badge').textContent = 'Especie no especificada';
+        titleBadge.textContent = 'Especie no especificada';
         return;
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/especies/${especieId}`);
+        const response = await fetch(API_BASE + '/api/especies/' + encodeURIComponent(especieId));
 
+        if (response.status === 404) {
+            titleBadge.textContent = 'Especie no encontrada';
+            return;
+        }
         if (!response.ok) {
-            throw new Error(`Error HTTP: ${response.status}`);
+            throw new Error('Error HTTP: ' + response.status);
         }
 
         const data = await response.json();
 
-        // 1. Título y Badge
-        const titleBadge = document.querySelector('.species-title-badge');
-        if (titleBadge) {
-            titleBadge.textContent = `${data.nombre_comun} - ${data.nombre_cientifico}`;
-        }
+        // 1. Título
+        titleBadge.textContent = `${data.nombre_comun} - ${data.nombre_cientifico}`;
 
-        // 2. Imagen Principal
+        // 2. Imagen principal (si la especie no tiene foto, se oculta el recuadro)
         const speciesImg = document.querySelector('.species-image-box img');
         if (speciesImg) {
-            speciesImg.src = data.ruta || '../public/assets/img/placeholder.jpg';
-            speciesImg.alt = data.nombre_comun;
+            if (data.ruta) {
+                speciesImg.src = data.ruta;
+                speciesImg.alt = data.nombre_comun;
+            } else {
+                speciesImg.style.display = 'none';
+            }
         }
 
-        // 3. Ficha Taxonómica (Solo muestra lo que proviene de la BD)
+        // 3. Ficha taxonómica (solo muestra lo que proviene de la base de datos)
         const taxonomyBox = document.querySelector('.taxonomy-list-card');
         if (taxonomyBox) {
-            taxonomyBox.innerHTML = `
-                <p><strong>Nombre común:</strong> ${data.nombre_comun || 'No registrado'}.</p>
-                <p><strong>Nombre científico:</strong> <em>${data.nombre_cientifico || 'No registrado'}</em>.</p>
-                <p><strong>Familia:</strong> ${data.familia || 'No especificada'}.</p>
-                <p><strong>Origen:</strong> ${data.origen || 'No especificado'}.</p>
-                <p><strong>Tipo de planta:</strong> ${data.tipo_planta || 'No especificado'}.</p>
-                <p><strong>Rango altitudinal:</strong> ${data.rango_altitudinal || 'No especificado'}</p>
-            `;
+            taxonomyBox.replaceChildren();
+            agregarDato(taxonomyBox, 'Nombre común', data.nombre_comun || 'No registrado', '.');
+            agregarDato(taxonomyBox, 'Nombre científico', data.nombre_cientifico || 'No registrado', '.', true);
+            agregarDato(taxonomyBox, 'Familia', data.familia || 'No especificada', '.');
+            agregarDato(taxonomyBox, 'Origen', data.origen || 'No especificado', '.');
+            agregarDato(taxonomyBox, 'Tipo de planta', data.tipo_planta || 'No especificado', '.');
+            agregarDato(taxonomyBox, 'Rango altitudinal', data.rango_altitudinal || 'No especificado', '');
         }
 
-        // 4. Bloques de Texto
+        // 4. Bloques de texto
         const blocks = document.querySelectorAll('.info-block-card');
         if (blocks[0]) {
             blocks[0].querySelector('p').textContent = data.descripcion || 'Sin información registrada en la base de datos.';
@@ -51,21 +56,38 @@ document.addEventListener('DOMContentLoaded', async () => {
             blocks[1].querySelector('p').textContent = data.importancia_ecologica || data.distribucion || 'Sin información registrada en la base de datos.';
         }
 
-        // 5. Inicializar Mapa
+        // 5. Mapa
         inicializarMapa(data.ubicaciones, data.nombre_comun);
 
     } catch (error) {
         console.error('Error al cargar la ficha:', error);
-        const titleBadge = document.querySelector('.species-title-badge');
-        if (titleBadge) {
-            titleBadge.textContent = 'Error al consultar la base de datos';
-        }
+        titleBadge.textContent = 'No se pudo cargar la ficha. Verifica que el servidor esté iniciado.';
     }
 });
 
+// Agrega una línea "Etiqueta: valor" sin interpretar el valor como HTML.
+function agregarDato(contenedor, etiqueta, valor, sufijo, cursiva = false) {
+    const linea = document.createElement('p');
+
+    const negrita = document.createElement('strong');
+    negrita.textContent = etiqueta + ':';
+    linea.append(negrita, ' ');
+
+    if (cursiva) {
+        const enfasis = document.createElement('em');
+        enfasis.textContent = valor;
+        linea.appendChild(enfasis);
+    } else {
+        linea.append(valor);
+    }
+
+    if (sufijo) linea.append(sufijo);
+    contenedor.appendChild(linea);
+}
+
 function inicializarMapa(ubicaciones, nombreEspecie) {
     const mapContainer = document.getElementById('mapa-girardot');
-    if (!mapContainer) return;
+    if (!mapContainer || typeof L === 'undefined') return;
 
     // Coordenadas centrales de Girardot
     const map = L.map('mapa-girardot').setView([4.3023, -74.8061], 14);
@@ -75,17 +97,21 @@ function inicializarMapa(ubicaciones, nombreEspecie) {
         attribution: '© OpenStreetMap'
     }).addTo(map);
 
-    // Solo pinta marcadores si existen registros reales de ubicaciones en PostgreSQL
+    // Solo pinta marcadores si existen ubicaciones registradas en la base de datos
     if (ubicaciones && ubicaciones.length > 0) {
         ubicaciones.forEach(ub => {
-            if (ub.direccion_coordenadas) {
-                const coords = ub.direccion_coordenadas.split(',').map(c => parseFloat(c.trim()));
-                if (coords.length === 2 && !isNaN(coords[0])) {
-                    L.marker(coords)
-                        .addTo(map)
-                        .bindPopup(`<b>${nombreEspecie}</b><br>${ub.sector}`);
-                }
-            }
+            if (!ub.direccion_coordenadas) return;
+
+            const coords = ub.direccion_coordenadas.split(',').map(c => parseFloat(c.trim()));
+            if (coords.length !== 2 || !coords.every(Number.isFinite)) return;
+
+            // El popup se arma con nodos de texto, no con HTML.
+            const popup = document.createElement('div');
+            const nombre = document.createElement('b');
+            nombre.textContent = nombreEspecie;
+            popup.append(nombre, document.createElement('br'), document.createTextNode(ub.sector || ''));
+
+            L.marker(coords).addTo(map).bindPopup(popup);
         });
     }
 }

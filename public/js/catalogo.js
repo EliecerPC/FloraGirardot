@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    const API_BASE = 'http://' + (window.location.hostname || 'localhost') + ':3000';
     const cardsGrid = document.querySelector('.cards-grid');
     const searchInput = document.getElementById('search-input');
     const checkboxes = document.querySelectorAll('.filters-sidebar input[type="checkbox"]');
@@ -6,7 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let todasLasEspecies = [];
 
     try {
-        const response = await fetch('http://localhost:3000/api/especies');
+        const response = await fetch(API_BASE + '/api/especies');
+        if (!response.ok) throw new Error('Error HTTP: ' + response.status);
         todasLasEspecies = await response.json();
 
         // Renderizar todas al inicio
@@ -14,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error('Error cargando el catálogo:', error);
-        cardsGrid.innerHTML = '<p>Error al conectar con el servidor.</p>';
+        mostrarMensaje('Error al conectar con el servidor.');
     }
 
     // Escuchar cambios en la barra de búsqueda y checkboxes
@@ -32,21 +34,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const habitatsSeleccionados = Array.from(document.querySelectorAll('.filter-habitat:checked')).map(cb => cb.value.toLowerCase());
 
         const especiesFiltradas = todasLasEspecies.filter(e => {
-            // 1. Filtro por texto (Nombre común, científico o familia)
+            // 1. Filtro por texto (nombre común, científico o familia)
             const coincideTexto = !textoBusqueda ||
                 (e.nombre_comun && e.nombre_comun.toLowerCase().includes(textoBusqueda)) ||
                 (e.nombre_cientifico && e.nombre_cientifico.toLowerCase().includes(textoBusqueda)) ||
                 (e.familia && e.familia.toLowerCase().includes(textoBusqueda));
 
-            // 2. Filtro por Tipo de Planta
+            // 2. Filtro por tipo de planta
             const coincideTipo = tiposSeleccionados.length === 0 ||
                 (e.tipo_planta && tiposSeleccionados.some(t => e.tipo_planta.toLowerCase().includes(t)));
 
-            // 3. Filtro por Origen
+            // 3. Filtro por origen
             const coincideOrigen = origenesSeleccionados.length === 0 ||
                 (e.origen && origenesSeleccionados.some(o => e.origen.toLowerCase().includes(o)));
 
-            // 4. Filtro por Hábitat
+            // 4. Filtro por hábitat
             const coincideHabitat = habitatsSeleccionados.length === 0 ||
                 (e.habitat && habitatsSeleccionados.some(h => e.habitat.toLowerCase().includes(h)));
 
@@ -56,33 +58,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderizarTarjetas(especiesFiltradas);
     }
 
+    function crearElemento(etiqueta, clase, texto) {
+        const elemento = document.createElement(etiqueta);
+        if (clase) elemento.className = clase;
+        if (texto !== undefined) elemento.textContent = texto;
+        return elemento;
+    }
+
+    function mostrarMensaje(texto, clase) {
+        cardsGrid.replaceChildren(crearElemento('p', clase, texto));
+    }
+
     function renderizarTarjetas(lista) {
         if (!lista || lista.length === 0) {
-            cardsGrid.innerHTML = '<p class="no-results">No se encontraron especies que coincidan con los filtros.</p>';
+            mostrarMensaje('No se encontraron especies que coincidan con los filtros.', 'no-results');
             return;
         }
+        cardsGrid.replaceChildren(...lista.map(crearTarjeta));
+    }
 
-        cardsGrid.innerHTML = lista.map(especie => {
-            let rutaImagen = especie.ruta || '../public/assets/img/acacia-card.jpg';
-            /*if (rutaImagen.includes('public/')) {
-                rutaImagen = rutaImagen.replace('../public/', '../');
-            }*/
+    // Se arma con textContent: los datos de la base nunca se interpretan como HTML.
+    function crearTarjeta(especie) {
+        const tarjeta = crearElemento('article', 'species-card-horizontal');
 
-            return `
-        <article class="species-card-horizontal">
-          <div class="card-img-wrapper">
-            <img src="${rutaImagen}" alt="${especie.nombre_comun}">
-          </div>
-          <div class="card-info-wrapper">
-            <div class="card-text-content">
-              <h3>${especie.nombre_comun}</h3>
-              <p class="scientific-name">${especie.nombre_cientifico}</p>
-              <p class="family-name">${especie.familia || 'Familia no especificada'}</p>
-            </div>
-            <a href="ficha.html?id=${especie.id_especie}" class="btn-card-white">Ver Ficha</a>
-          </div>
-        </article>
-      `;
-        }).join('');
+        const contenedorImagen = crearElemento('div', 'card-img-wrapper');
+        const imagen = document.createElement('img');
+        imagen.src = especie.ruta || '../public/assets/img/acacia-card.jpg';
+        imagen.alt = especie.nombre_comun;
+        contenedorImagen.appendChild(imagen);
+
+        const info = crearElemento('div', 'card-info-wrapper');
+        const texto = crearElemento('div', 'card-text-content');
+        texto.append(
+            crearElemento('h3', '', especie.nombre_comun),
+            crearElemento('p', 'scientific-name', especie.nombre_cientifico),
+            crearElemento('p', 'family-name', especie.familia || 'Familia no especificada')
+        );
+
+        const enlace = crearElemento('a', 'btn-card-white', 'Ver Ficha');
+        enlace.href = 'ficha.html?id=' + encodeURIComponent(especie.id_especie);
+
+        info.append(texto, enlace);
+        tarjeta.append(contenedorImagen, info);
+        return tarjeta;
     }
 });
