@@ -1379,29 +1379,6 @@ body:has(.review-main) .nav-link {
     font-size: 15px;
 }
 
-/* Barra de sesión en Participación */
-#sesion-info {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.75rem;
-    font-family: 'Poppins', sans-serif;
-}
-#sesion-info button {
-    font: inherit;
-    font-weight: 600;
-    padding: 0.4rem 1rem;
-    border: 0;
-    border-radius: 999px;
-    background: #2f5d46;
-    color: #fff;
-    cursor: pointer;
-}
-#sesion-info a {
-    color: #0f9d4b;
-    font-weight: 600;
-}
-
 /* ==========================================
    PORTADA: PRESENTACIÓN, ACCIONES Y SECCIONES
    ========================================== */
@@ -1835,5 +1812,349 @@ body:has(.review-main) .nav-link {
     .logo-group:hover .logo-icon,
     .logo-group:focus-visible .logo-icon {
         transform: none;
+    }
+}
+
+/* ==========================================
+   MENÚ DE USUARIO EN EL ENCABEZADO
+   ========================================== */
+
+/* Garantiza que el atributo "hidden" siempre oculte el elemento */
+[hidden] {
+    display: none !important;
+}
+
+.nav-menu {
+    margin-left: auto;
+}
+
+.user-menu {
+    position: relative;
+}
+
+.user-menu-button {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(46, 90, 68, 0.25);
+    border-radius: 50%;
+    background-color: #FFFFFF;
+    color: var(--btn-green);
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.user-menu-button:hover,
+.user-menu-button[aria-expanded="true"] {
+    background-color: var(--btn-green);
+    border-color: var(--btn-green);
+    color: #FFFFFF;
+    transform: translateY(-1px);
+}
+
+.user-menu-button:focus-visible {
+    outline: 3px solid var(--girardot-blue);
+    outline-offset: 2px;
+}
+
+/* Punto verde: indica que hay una sesión iniciada */
+.user-status-dot {
+    position: absolute;
+    top: -1px;
+    right: -1px;
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--header-bg);
+    border-radius: 50%;
+    background-color: #19B35B;
+}
+
+.user-menu-panel {
+    position: absolute;
+    top: calc(100% + 12px);
+    right: 0;
+    z-index: 10;
+    width: 320px;
+    max-width: calc(100vw - 24px);
+    padding: 20px;
+    border: 1px solid #E0E4DE;
+    border-radius: 18px;
+    background-color: #FFFFFF;
+    box-shadow: 0 16px 40px rgba(30, 58, 43, 0.18);
+    animation: user-panel-in 0.18s ease-out;
+}
+
+@keyframes user-panel-in {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.user-panel-title {
+    margin-bottom: 6px;
+    color: var(--text-dark);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.user-panel-text,
+.user-panel-note,
+.user-panel-since {
+    color: #555555;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.user-panel-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.btn-panel {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    border: 2px solid var(--btn-green);
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.btn-panel-primary {
+    background-color: var(--btn-green);
+    color: #FFFFFF;
+}
+
+.btn-panel-primary:hover {
+    background-color: #234836;
+    border-color: #234836;
+}
+
+.btn-panel-secondary {
+    background-color: transparent;
+    color: var(--btn-green);
+}
+
+.btn-panel-secondary:hover {
+    background-color: var(--btn-green);
+    color: #FFFFFF;
+}
+
+/* Cuenta con sesión iniciada */
+
+.user-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.user-avatar {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--btn-green), var(--girardot-green));
+    color: #FFFFFF;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.user-panel-id {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-panel-name {
+    color: var(--text-dark);
+    font-size: 16px;
+    overflow-wrap: anywhere;
+}
+
+.user-panel-email {
+    color: #555555;
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+
+.user-role-badge {
+    align-self: flex-start;
+    margin-top: 4px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background-color: #DDF3E4;
+    color: #1D6B3C;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.user-panel-since {
+    margin-top: 14px;
+}
+
+.user-panel-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #E5E8E3;
+}
+
+.user-panel-section-title {
+    margin-bottom: 10px;
+    color: #1A1A1A;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+}
+
+.user-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.user-stat {
+    padding: 8px 2px;
+    border-radius: 12px;
+    background-color: #F0F0ED;
+    text-align: center;
+}
+
+.user-stat strong {
+    display: block;
+    color: var(--text-dark);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 18px;
+}
+
+.user-stat span {
+    display: block;
+    color: #555555;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.user-panel-links {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 14px;
+}
+
+.user-panel-link {
+    display: block;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--text-dark);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+}
+
+.user-panel-link:hover,
+.user-panel-link:focus-visible {
+    background-color: #EEF4EF;
+}
+
+.user-panel-logout {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1px solid #E7B9B9;
+    border-radius: 10px;
+    background-color: #FFFFFF;
+    color: #9D2525;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.user-panel-logout:hover {
+    border-color: #C75B5B;
+    background-color: #FBE3E3;
+}
+
+.user-panel-logout:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.user-menu-panel a:focus-visible,
+.user-menu-panel button:focus-visible {
+    outline: 3px solid var(--girardot-blue);
+    outline-offset: 2px;
+}
+
+/* Aviso de Participación cuando no hay sesión */
+.session-notice {
+    padding: 14px 18px;
+    border: 1px solid #E0E4DE;
+    border-left: 4px solid var(--girardot-green);
+    border-radius: 14px;
+    background-color: #FFFFFF;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.session-notice a {
+    color: var(--girardot-green);
+    font-weight: 600;
+}
+
+/* Encabezado en dos filas en pantallas pequeñas:
+   logo y usuario arriba, menú debajo */
+@media (max-width: 760px) {
+    .header-container {
+        flex-wrap: wrap;
+        row-gap: 8px;
+    }
+
+    .logo-group {
+        order: 0;
+    }
+
+    .user-menu {
+        order: 1;
+        margin-left: auto;
+    }
+
+    .nav-menu {
+        order: 2;
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .user-menu-button,
+    .user-panel-link,
+    .btn-panel,
+    .user-panel-logout {
+        transition: none;
+    }
+
+    .user-menu-panel {
+        animation: none;
     }
 }

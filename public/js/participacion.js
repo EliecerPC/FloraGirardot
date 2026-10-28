@@ -79,12 +79,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    function mostrarEnlaceSesion(texto, href, etiqueta) {
-        sesionInfo.textContent = texto + ' ';
-        const link = document.createElement('a');
-        link.href = href;
-        link.textContent = etiqueta;
-        sesionInfo.appendChild(link);
+    function enlaceSesion(href, texto) {
+        const enlace = document.createElement('a');
+        enlace.href = href;
+        enlace.textContent = texto;
+        return enlace;
+    }
+
+    function mostrarAviso(contenido) {
+        sesionInfo.className = 'session-notice';
+        sesionInfo.hidden = false;
+        sesionInfo.replaceChildren(...contenido);
     }
 
     async function comprobarSesion() {
@@ -92,45 +97,25 @@ document.addEventListener('DOMContentLoaded', async () => {
             const response = await fetch(API_BASE + '/api/auth/me', { credentials: 'include' });
             if (!response.ok) {
                 formularioAporte.style.display = 'none';
-                mostrarEnlaceSesion('Para enviar un reporte comunitario,', 'login.html', 'inicia sesión');
-                const registro = document.createElement('a');
-                registro.href = 'registro.html';
-                registro.textContent = ' o crea una cuenta ciudadana.';
-                sesionInfo.appendChild(registro);
+                mostrarAviso([
+                    'Para enviar un reporte comunitario, ',
+                    enlaceSesion('login.html', 'inicia sesión'),
+                    ' o ',
+                    enlaceSesion('registro.html', 'crea una cuenta ciudadana'),
+                    '.'
+                ]);
                 return null;
             }
 
             const data = await response.json();
-            const usuario = data.usuario;
-            document.getElementById('nav-login')?.remove();
-            document.getElementById('nav-registro')?.remove();
-            sesionInfo.textContent = 'Sesión iniciada como ' + usuario.nombre + ' (' + usuario.rol + '). ';
-            const cerrar = document.createElement('button');
-            cerrar.type = 'button';
-            cerrar.textContent = 'Cerrar sesión';
-            cerrar.addEventListener('click', async () => {
-                try {
-                    await fetch(API_BASE + '/api/auth/logout', {
-                        method: 'POST',
-                        credentials: 'include'
-                    });
-                    window.location.reload();
-                } catch (error) {
-                    sesionInfo.textContent = 'No fue posible cerrar sesión. Inténtalo de nuevo.';
-                }
-            });
-            sesionInfo.appendChild(cerrar);
-            if (['admin', 'investigador'].includes(usuario.rol)) {
-                const revision = document.createElement('a');
-                revision.href = 'revision.html';
-                revision.textContent = ' Abrir bandeja de revisión';
-                sesionInfo.appendChild(revision);
-            }
+            // La cuenta y el cierre de sesión se gestionan desde el menú de usuario del encabezado.
+            sesionInfo.hidden = true;
+            sesionInfo.replaceChildren();
             formularioAporte.style.display = '';
-            return usuario;
+            return data.usuario;
         } catch (error) {
             formularioAporte.style.display = 'none';
-            sesionInfo.textContent = 'No se pudo comprobar la sesión. Verifica que el servidor esté iniciado.';
+            mostrarAviso(['No se pudo comprobar la sesión. Verifica que el servidor esté iniciado.']);
             return null;
         }
     }
@@ -477,5 +462,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     await cargarAportes();
     if (formularioAporte && formularioAporte.style.display !== 'none') {
         await cargarMisAportes();
+        if (window.location.hash === '#mis-aportes') {
+            const seccion = document.getElementById('mis-aportes');
+            if (seccion) seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     }
 });

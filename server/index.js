@@ -207,9 +207,23 @@ app.post('/api/auth/login', limitarLogin, async (req, res) => {
     }
 });
 
-app.get('/api/auth/me', (req, res) => {
+app.get('/api/auth/me', async (req, res) => {
     if (!req.session.user) return res.status(401).json({ error: 'No has iniciado sesión.' });
-    res.json({ usuario: req.session.user });
+    try {
+        const result = await pool.query(
+            'SELECT fecha_registro FROM usuario WHERE id_usuario = $1',
+            [req.session.user.id_usuario]
+        );
+        res.json({
+            usuario: {
+                ...req.session.user,
+                fecha_registro: result.rows[0] ? result.rows[0].fecha_registro : null
+            }
+        });
+    } catch (err) {
+        console.error('Error al consultar la cuenta:', err);
+        res.status(500).json({ error: 'No fue posible consultar la cuenta.' });
+    }
 });
 app.post('/api/auth/logout', (req, res) => {
     if (!req.session) return res.json({ mensaje: 'Sesión cerrada.' });
