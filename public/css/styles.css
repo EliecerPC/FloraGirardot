@@ -34,10 +34,37 @@ body {
    HEADER Y NAVEGACIÓN
    ========================================== */
 
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 84px; /* evita que el encabezado fijo tape los títulos al usar enlaces #ancla */
+}
+
 .main-header {
-    background-color: var(--header-bg);
-    padding: 12px 40px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    top: 0;
+    z-index: 2000;
+    padding: 10px 40px;
+    background-color: rgba(234, 234, 234, 0.9);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(30, 58, 43, 0.08);
+    box-shadow: 0 2px 10px rgba(30, 58, 43, 0.06);
+}
+
+/* Franja con los colores de Girardot en el borde superior */
+.main-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(
+            90deg,
+            var(--girardot-red) 0 33.33%,
+            var(--girardot-blue) 33.33% 66.66%,
+            var(--girardot-green) 66.66% 100%
+    );
 }
 
 .header-container {
@@ -46,6 +73,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 24px;
 }
 
 .logo-group {
@@ -63,34 +91,109 @@ body {
     font-family: 'Montserrat', sans-serif;
     font-size: 24px;
     font-weight: 800;
+    letter-spacing: -0.3px;
     color: #1A1A1A;
 }
 
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: 6px;
 }
 
 .nav-link {
-    text-decoration: none;
+    position: relative;
+    padding: 8px 14px;
+    border-radius: 999px;
     color: #1A1A1A;
     font-weight: 500;
     font-size: 15px;
+    text-decoration: none;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Línea tricolor que se dibuja al pasar el mouse y se mantiene en la página actual */
+.nav-link::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 3px;
+    height: 3px;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--girardot-red), var(--girardot-blue), var(--girardot-green));
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.25s ease;
+}
+
+.nav-link:hover {
+    background-color: rgba(46, 90, 68, 0.1);
+    color: var(--btn-green);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+    transform: scaleX(1);
 }
 
 .nav-link.active {
     font-weight: 700;
+    color: var(--text-dark);
 }
 
 .btn-buscar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 6px;
+    padding: 9px 22px;
+    border-radius: 999px;
     background-color: var(--btn-green);
     color: #FFFFFF;
-    text-decoration: none;
-    padding: 8px 24px;
-    border-radius: 4px;
     font-weight: 600;
     font-size: 15px;
+    text-decoration: none;
+    box-shadow: 0 2px 6px rgba(46, 90, 68, 0.25);
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Ícono de lupa */
+.btn-buscar::before {
+    content: '';
+    width: 16px;
+    height: 16px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3.5-3.5'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+
+.btn-buscar:hover {
+    background-color: #234836;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(46, 90, 68, 0.3);
+}
+
+.btn-buscar:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(46, 90, 68, 0.25);
+}
+
+.nav-link:focus-visible,
+.btn-buscar:focus-visible {
+    outline: 3px solid var(--girardot-blue);
+    outline-offset: 2px;
+}
+
+/* Respeta a quienes tienen desactivadas las animaciones en su sistema */
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+
+    .nav-link,
+    .nav-link::after,
+    .btn-buscar {
+        transition: none;
+    }
 }
 
 /* ==========================================
@@ -135,23 +238,26 @@ body {
 .badge-blue {
     background-color: var(--girardot-blue);
     color: #FFFFFF;
-    padding: 0 16px;
-    border-radius: 18px;
-    margin: 0 4px;
+    padding: 0 7px;
+    border-radius: 16px;
+    margin: 0;
     display: inline-block;
 }
 
 .hero-image-side {
-    width: 480px;
-    height: 380px;
+    width: 440px;
+    height: 440px;
+    flex-shrink: 0;
 }
 
 .hero-img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
-    border-radius: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
+    padding: 28px;
+    background: radial-gradient(circle at 30% 20%, #FFFFFF 0%, #E9EEE7 100%);
+    border-radius: 28px;
+    box-shadow: 0 8px 24px rgba(30, 58, 43, 0.12);
 }
 
 /* ==========================================
@@ -1467,9 +1573,9 @@ body:has(.review-main) .nav-link {
 
     .hero-image-side {
         width: 100%;
-        max-width: 480px;
+        max-width: 400px;
         height: auto;
-        aspect-ratio: 480 / 380;
+        aspect-ratio: 1 / 1;
     }
 
     .home-section {
@@ -1485,5 +1591,249 @@ body:has(.review-main) .nav-link {
 @media (max-width: 480px) {
     .city-title {
         font-size: 44px;
+    }
+}
+
+/* ==========================================
+   ADAPTACIÓN A TABLETAS Y TELÉFONOS
+   (catálogo, ficha, participación y revisión)
+   ========================================== */
+
+/* Formulario de participación: dos columnas en pantallas grandes */
+.form-dos-columnas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+    /* Catálogo y Participación: una sola columna */
+    .catalog-body {
+        grid-template-columns: 1fr;
+    }
+
+    /* Filtros: los grupos se acomodan en filas según el ancho disponible */
+    .catalog-layout .filters-sidebar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 32px;
+    }
+
+    .catalog-layout .filters-title {
+        width: 100%;
+        margin-bottom: 8px;
+    }
+
+    .catalog-layout .filter-group {
+        margin-bottom: 8px;
+    }
+
+    /* Ficha: la imagen pasa arriba de los datos */
+    .sheet-main-info {
+        grid-template-columns: 1fr;
+    }
+
+    .species-image-box {
+        height: 260px;
+        min-height: 240px;
+    }
+}
+
+@media (max-width: 700px) {
+    .cards-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-dos-columnas {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    /* Catálogo */
+    .catalog-layout {
+        padding: 24px 16px;
+    }
+
+    .catalog-header-area {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .catalog-title {
+        min-width: 0;
+        font-size: 32px;
+    }
+
+    /* Ficha */
+    .sheet-container {
+        padding: 24px 16px;
+    }
+
+    .breadcrumb-bar {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .species-title-badge {
+        flex-basis: 100%;
+    }
+
+    .taxonomy-list-card,
+    .info-block-card {
+        padding: 20px;
+    }
+
+    .leaflet-map-box {
+        height: 260px;
+    }
+
+    /* Bandeja de revisión: botones compactos.
+       "Aprobar" ocupa una fila y los otros dos comparten la siguiente. */
+    .review-actions {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .review-button {
+        width: auto;
+        flex: 1 1 calc(50% - 4px);
+        min-height: 40px;
+        padding: 8px 10px;
+    }
+
+    .review-button-approve {
+        flex-basis: 100%;
+    }
+}
+
+/* Encabezado en celular: todo el menú cabe en una sola fila */
+@media (max-width: 600px) {
+    .main-header {
+        padding: 10px 14px;
+    }
+
+    .header-container {
+        gap: 8px;
+    }
+
+    .logo-title {
+        font-size: 21px;
+    }
+
+    .nav-menu {
+        width: 100%;
+        justify-content: space-between;
+        gap: 2px;
+    }
+
+    .nav-link {
+        padding: 7px 9px;
+        font-size: 14px;
+    }
+
+    .nav-link::after {
+        left: 9px;
+        right: 9px;
+    }
+
+    .btn-buscar {
+        margin-left: 0;
+        padding: 8px 14px;
+        font-size: 14px;
+    }
+
+    .btn-buscar::before {
+        width: 14px;
+        height: 14px;
+    }
+}
+
+/* Recuadro azul del título: proporciones en pantallas pequeñas */
+@media (max-width: 900px) {
+    .badge-blue {
+        padding: 0 5px;
+        border-radius: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .badge-blue {
+        padding: 0 4px;
+        border-radius: 10px;
+    }
+}
+
+/* ==========================================
+   LOGO DEL ENCABEZADO
+   ========================================== */
+
+.logo-group {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-icon {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), height 0.25s ease;
+}
+
+.logo-group:hover .logo-icon,
+.logo-group:focus-visible .logo-icon {
+    transform: rotate(-14deg) scale(1.12);
+}
+
+.logo-group:focus-visible {
+    outline: 3px solid var(--girardot-blue);
+    outline-offset: 4px;
+    border-radius: 12px;
+}
+
+/* La regla global "* { font-family }" pisa la herencia, por eso se indica la fuente aquí. */
+.logo-flora,
+.logo-girardot {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+}
+
+.logo-flora {
+    color: var(--text-dark);
+}
+
+.logo-girardot {
+    color: var(--girardot-red);
+    transition: color 0.25s ease;
+}
+
+.logo-group:hover .logo-girardot,
+.logo-group:focus-visible .logo-girardot {
+    color: var(--girardot-blue);
+}
+
+/* Encabezado compacto al hacer scroll */
+.main-header {
+    transition: padding 0.25s ease, box-shadow 0.25s ease;
+}
+
+.main-header.scrolled {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    box-shadow: 0 6px 20px rgba(30, 58, 43, 0.12);
+}
+
+.main-header.scrolled .logo-icon {
+    height: 34px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .logo-icon,
+    .logo-girardot,
+    .main-header {
+        transition: none;
+    }
+
+    .logo-group:hover .logo-icon,
+    .logo-group:focus-visible .logo-icon {
+        transform: none;
     }
 }
