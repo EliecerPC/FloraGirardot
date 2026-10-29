@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS usuario (
                                        contrasena VARCHAR(255) NOT NULL,
                                        rol VARCHAR(50) DEFAULT 'ciudadano', -- 'ciudadano' (registro público), 'investigador' y 'admin' (cuentas autorizadas)
                                        estado VARCHAR(20) DEFAULT 'activo',
-                                       fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                                       fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                       foto_perfil VARCHAR(100) -- nombre del archivo en uploads/perfiles/
 );
 
 -- 2. Tabla: ESPECIE

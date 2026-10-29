@@ -2158,3 +2158,203 @@ body:has(.review-main) .nav-link {
         animation: none;
     }
 }
+
+/* ==========================================
+   FOTO DE PERFIL Y EDITOR DE PERFIL
+   ========================================== */
+
+.user-icon {
+    display: inline-flex;
+}
+
+.user-photo {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-menu-button.has-photo {
+    padding: 0;
+    border-color: var(--btn-green);
+    background-color: #FFFFFF;
+}
+
+.user-menu-button.has-photo:hover,
+.user-menu-button.has-photo[aria-expanded="true"] {
+    background-color: #FFFFFF;
+}
+
+.user-avatar {
+    overflow: hidden;
+}
+
+.user-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.user-panel-link-button {
+    width: 100%;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+}
+
+/* Cuadro "Mi perfil" */
+
+.profile-dialog {
+    width: min(480px, calc(100vw - 24px));
+    max-height: calc(100vh - 32px);
+    padding: 0;
+    border: 0;
+    border-radius: 20px;
+    background-color: #FFFFFF;
+    color: var(--text-dark);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+    overflow: auto;
+}
+
+.profile-dialog::backdrop {
+    background-color: rgba(20, 35, 28, 0.55);
+}
+
+.profile-dialog-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 24px;
+    border-bottom: 1px solid #E5E8E3;
+    background-color: #FFFFFF;
+}
+
+.profile-dialog-header h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.profile-close {
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background-color: #F0F0ED;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.profile-close:hover {
+    background-color: #E2E6E0;
+}
+
+.profile-dialog-body {
+    padding: 0 24px 24px;
+}
+
+.profile-section {
+    padding: 20px 0;
+    border-bottom: 1px solid #E5E8E3;
+}
+
+.profile-section:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+}
+
+.profile-section h3 {
+    margin-bottom: 12px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+}
+
+.profile-photo-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 18px;
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+}
+
+.profile-photo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.btn-compact {
+    width: auto;
+    padding: 8px 18px;
+}
+
+.btn-panel-danger {
+    background-color: transparent;
+    border-color: #E7B9B9;
+    color: #9D2525;
+}
+
+.btn-panel-danger:hover {
+    background-color: #FBE3E3;
+    border-color: #C75B5B;
+}
+
+.btn-panel:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.profile-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 12px;
+}
+
+.profile-field label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.profile-field input {
+    padding: 10px 14px;
+    border: 1px solid #CBD2C8;
+    border-radius: 12px;
+    background-color: #FFFFFF;
+    font-size: 15px;
+}
+
+.profile-field input:focus-visible,
+.profile-dialog button:focus-visible {
+    outline: 3px solid var(--girardot-blue);
+    outline-offset: 2px;
+}
+
+.profile-hint {
+    margin: 4px 0 12px;
+    color: #666666;
+    font-size: 12.5px;
+    line-height: 1.4;
+}
+
+.profile-message {
+    min-height: 1.3em;
+    margin-top: 10px;
+    color: #1D6B3C;
+    font-size: 14px;
+}
+
+.profile-message.is-error {
+    color: #B3261E;
+}

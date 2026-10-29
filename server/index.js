@@ -79,6 +79,53 @@ const upload = multer({
     }
 });
 
+// Fotos de perfil: carpeta privada, solo se entregan a su dueño por /api/cuenta/foto.
+const perfilesDirectory = path.join(__dirname, '../uploads/perfiles');
+fs.mkdirSync(perfilesDirectory, { recursive: true });
+
+const NOMBRE_FOTO_PERFIL = /^perfil-\d+-\d+\.(jpe?g|png|webp)$/;
+
+const uploadPerfil = multer({
+    storage: multer.diskStorage({
+        destination: (_req, _file, cb) => cb(null, perfilesDirectory),
+        filename: (req, file, cb) => {
+            cb(null, 'perfil-' + req.session.user.id_usuario + '-' + Date.now() + EXTENSIONES[file.mimetype]);
+        }
+    }),
+    limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+    fileFilter: (_req, file, cb) => {
+        if (!EXTENSIONES[file.mimetype]) {
+            return cb(new Error('La imagen debe estar en formato JPG, PNG o WEBP.'));
+        }
+        cb(null, true);
+    }
+});
+
+function borrarFotoPerfil(nombreArchivo) {
+    if (nombreArchivo && NOMBRE_FOTO_PERFIL.test(nombreArchivo)) {
+        fs.unlink(path.join(perfilesDirectory, nombreArchivo), () => {});
+    }
+}
+
+// 5 intentos fallidos de cambiar la contraseña cada 15 minutos.
+const limitarContrasena = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 5,
+    skipSuccessfulRequests: true,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: 'Demasiados intentos. Inténtalo de nuevo en unos minutos.' }
+});
+
+// Cambios de nombre y de foto: 30 por hora.
+const limitarCuenta = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: 30,
+    standardHeaders: 'draft-7',
+    legacyHeaders: false,
+    message: { error: 'Has hecho demasiados cambios. Inténtalo más tarde.' }
+});
+
 // Comprueba los primeros bytes del archivo: el mimetype lo declara el cliente y puede mentir.
 function firmaValida(rutaArchivo, mimetype) {
     const buf = Buffer.alloc(12);
@@ -211,13 +258,15 @@ app.get('/api/auth/me', async (req, res) => {
     if (!req.session.user) return res.status(401).json({ error: 'No has iniciado sesión.' });
     try {
         const result = await pool.query(
-            'SELECT fecha_registro FROM usuario WHERE id_usuario = $1',
+            'SELECT fecha_registro, (foto_perfil IS NOT NULL) AS tiene_foto FROM usuario WHERE id_usuario = $1',
             [req.session.user.id_usuario]
         );
+        const fila = result.rows[0] || {};
         res.json({
             usuario: {
                 ...req.session.user,
-                fecha_registro: result.rows[0] ? result.rows[0].fecha_registro : null
+                fecha_registro: fila.fecha_registro || null,
+                tiene_foto: Boolean(fila.tiene_foto)
             }
         });
     } catch (err) {
@@ -288,6 +337,130 @@ app.get('/api/especies/:id', async (req, res) => {
     } catch (err) {
         console.error('Error al consultar la ficha:', err);
         res.status(500).json({ error: 'Error al consultar la ficha técnica.' });
+    }
+});
+
+// -------------------- Cuenta del usuario --------------------
+
+// Cambiar el nombre.
+app.patch('/api/cuenta/nombre', limitarCuenta, requireAuth, async (req, res) => {
+    const nombre = String(req.body.nombre || '').trim();
+    if (nombre.length < 2 || nombre.length > 100) {
+        return res.status(400).json({ error: 'El nombre debe tener entre 2 y 100 caracteres.' });
+    }
+    try {
+        await pool.query('UPDATE usuario SET nombre = $1 WHERE id_usuario = $2', [nombre, req.session.user.id_usuario]);
+        req.session.user.nombre = nombre;
+        req.session.save(err => {
+            if (err) return res.status(500).json({ error: 'El nombre se guardó, pero no fue posible actualizar la sesión.' });
+            res.json({ mensaje: 'Nombre actualizado.', usuario: req.session.user });
+        });
+    } catch (err) {
+        console.error('Error al cambiar el nombre:', err);
+        res.status(500).json({ error: 'No fue posible actualizar el nombre.' });
+    }
+});
+
+// Cambiar la contraseña (exige la actual) y cerrar las demás sesiones del usuario.
+app.post('/api/cuenta/contrasena', limitarContrasena, requireAuth, async (req, res) => {
+    const actual = String(req.body.actual || '');
+    const nueva = String(req.body.nueva || '');
+    const id = req.session.user.id_usuario;
+
+    if (nueva.length < 8 || nueva.length > 72) {
+        return res.status(400).json({ error: 'La nueva contraseña debe tener entre 8 y 72 caracteres.' });
+    }
+    if (nueva === actual) {
+        return res.status(400).json({ error: 'La nueva contraseña debe ser distinta de la actual.' });
+    }
+
+    try {
+        const result = await pool.query('SELECT contrasena FROM usuario WHERE id_usuario = $1', [id]);
+        if (!result.rows.length || !(await bcrypt.compare(actual, result.rows[0].contrasena))) {
+            return res.status(401).json({ error: 'La contraseña actual no es correcta.' });
+        }
+
+        const hash = await bcrypt.hash(nueva, 12);
+        await pool.query('UPDATE usuario SET contrasena = $1 WHERE id_usuario = $2', [hash, id]);
+
+        // Cierra la sesión en los demás dispositivos; la actual sigue activa.
+        try {
+            await pool.query(
+                "DELETE FROM session WHERE (sess -> 'user' ->> 'id_usuario') = $1 AND sid <> $2",
+                [String(id), req.sessionID]
+            );
+        } catch (errSesiones) {
+            console.error('No se pudieron cerrar las otras sesiones:', errSesiones.message);
+        }
+
+        res.json({ mensaje: 'Contraseña actualizada. Se cerró tu sesión en otros dispositivos.' });
+    } catch (err) {
+        console.error('Error al cambiar la contraseña:', err);
+        res.status(500).json({ error: 'No fue posible cambiar la contraseña.' });
+    }
+});
+
+// Foto de perfil: solo la puede ver su dueño.
+app.get('/api/cuenta/foto', requireAuth, async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT foto_perfil FROM usuario WHERE id_usuario = $1',
+            [req.session.user.id_usuario]
+        );
+        const foto = result.rows[0] && result.rows[0].foto_perfil;
+        if (!foto || !NOMBRE_FOTO_PERFIL.test(foto)) {
+            return res.status(404).json({ error: 'No tienes foto de perfil.' });
+        }
+        res.setHeader('Cache-Control', 'private, no-cache');
+        res.sendFile(path.join(perfilesDirectory, foto), err => {
+            if (err && !res.headersSent) res.status(404).json({ error: 'No tienes foto de perfil.' });
+        });
+    } catch (err) {
+        console.error('Error al entregar la foto de perfil:', err);
+        res.status(500).json({ error: 'No se pudo cargar la foto de perfil.' });
+    }
+});
+
+app.post('/api/cuenta/foto', limitarCuenta, requireAuth, (req, res, next) => {
+    uploadPerfil.single('foto')(req, res, err => {
+        if (err) {
+            const mensaje = err.code === 'LIMIT_FILE_SIZE'
+                ? 'La imagen supera los 2 MB.'
+                : (err.message || 'No fue posible procesar la imagen.');
+            return res.status(400).json({ error: mensaje });
+        }
+        next();
+    });
+}, async (req, res) => {
+    if (!req.file) return res.status(400).json({ error: 'Selecciona una imagen.' });
+    if (!firmaValida(req.file.path, req.file.mimetype)) {
+        fs.unlink(req.file.path, () => {});
+        return res.status(400).json({ error: 'El archivo no es una imagen válida.' });
+    }
+
+    const id = req.session.user.id_usuario;
+    try {
+        const anterior = await pool.query('SELECT foto_perfil FROM usuario WHERE id_usuario = $1', [id]);
+        await pool.query('UPDATE usuario SET foto_perfil = $1 WHERE id_usuario = $2', [req.file.filename, id]);
+        borrarFotoPerfil(anterior.rows[0] && anterior.rows[0].foto_perfil);
+        res.json({ mensaje: 'Foto de perfil actualizada.', tiene_foto: true });
+    } catch (err) {
+        fs.unlink(req.file.path, () => {});
+        console.error('Error al guardar la foto de perfil:', err);
+        res.status(500).json({ error: 'No fue posible guardar la foto de perfil.' });
+    }
+});
+
+app.delete('/api/cuenta/foto', limitarCuenta, requireAuth, async (req, res) => {
+    const id = req.session.user.id_usuario;
+    try {
+        const anterior = await pool.query('SELECT foto_perfil FROM usuario WHERE id_usuario = $1', [id]);
+        await pool.query('UPDATE usuario SET foto_perfil = NULL WHERE id_usuario = $1', [id]);
+        borrarFotoPerfil(anterior.rows[0] && anterior.rows[0].foto_perfil);
+        res.json({ mensaje: 'Foto de perfil eliminada.', tiene_foto: false });
+    } catch (err) {
+        console.error('Error al eliminar la foto de perfil:', err);
+        res.status(500).json({ error: 'No fue posible eliminar la foto de perfil.' });
     }
 });
 

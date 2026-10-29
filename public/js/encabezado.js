@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function crearMenuUsuario(destino) {
         const ETIQUETAS_ROL = { ciudadano: 'Ciudadano', investigador: 'Investigador', admin: 'Administrador' };
         // sesion: 'cargando' | 'anonimo' | 'activa' | 'error'
-        const estado = { sesion: 'cargando', usuario: null, aportes: null };
+        const estado = { sesion: 'cargando', usuario: null, aportes: null, fotoVersion: Date.now() };
 
         const nodo = (etiqueta, clase, texto) => {
             const elemento = document.createElement(etiqueta);
@@ -60,6 +60,10 @@ document.addEventListener('DOMContentLoaded', () => {
             return a;
         };
 
+        // El parámetro v obliga al navegador a pedir la foto de nuevo cuando cambia.
+        const urlFoto = () => API_BASE + '/api/cuenta/foto?v=' + estado.fotoVersion;
+        const inicialUsuario = () => ((estado.usuario && estado.usuario.nombre) || '?').trim().charAt(0).toUpperCase();
+
         const contenedor = nodo('div', 'user-menu');
 
         const boton = nodo('button', 'user-menu-button');
@@ -68,15 +72,27 @@ document.addEventListener('DOMContentLoaded', () => {
         boton.setAttribute('aria-expanded', 'false');
         boton.setAttribute('aria-controls', 'panel-usuario');
         boton.setAttribute('aria-label', 'Menú de usuario');
+
+        const icono = nodo('span', 'user-icon');
         // Ícono fijo: no incluye ningún dato del usuario.
-        boton.innerHTML =
+        icono.innerHTML =
             '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" ' +
             'stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
             '<circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"></path></svg>';
 
+        const foto = nodo('img', 'user-photo');
+        foto.alt = '';
+        foto.hidden = true;
+        foto.addEventListener('error', () => {
+            if (estado.usuario) estado.usuario.tiene_foto = false;
+            actualizarBoton();
+            if (!panel.hidden) dibujarPanel();
+        });
+
         const punto = nodo('span', 'user-status-dot');
         punto.hidden = true;
-        boton.appendChild(punto);
+
+        boton.append(icono, foto, punto);
 
         const panel = nodo('div', 'user-menu-panel');
         panel.id = 'panel-usuario';
@@ -85,7 +101,35 @@ document.addEventListener('DOMContentLoaded', () => {
         contenedor.append(boton, panel);
         destino.appendChild(contenedor);
 
+        // ---------- Botón: ícono o foto de perfil ----------
+
+        function actualizarBoton() {
+            const conFoto = estado.sesion === 'activa' && Boolean(estado.usuario && estado.usuario.tiene_foto);
+            boton.classList.toggle('has-photo', conFoto);
+            icono.hidden = conFoto;
+            foto.hidden = !conFoto;
+            if (conFoto) foto.src = urlFoto();
+            punto.hidden = estado.sesion !== 'activa';
+        }
+
         // ---------- Contenido del panel ----------
+
+        function crearAvatar() {
+            const avatar = nodo('div', 'user-avatar');
+            if (estado.usuario.tiene_foto) {
+                const imagen = nodo('img', 'user-avatar-img');
+                imagen.alt = '';
+                imagen.src = urlFoto();
+                imagen.addEventListener('error', () => {
+                    imagen.remove();
+                    avatar.textContent = inicialUsuario();
+                });
+                avatar.appendChild(imagen);
+            } else {
+                avatar.textContent = inicialUsuario();
+            }
+            return avatar;
+        }
 
         function resumenReportes() {
             const seccion = nodo('div', 'user-panel-section');
@@ -121,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function dibujarCuenta() {
             const u = estado.usuario;
-            const inicial = (u.nombre || '?').trim().charAt(0).toUpperCase();
 
             const cabecera = nodo('div', 'user-panel-header');
             const identidad = nodo('div', 'user-panel-id');
@@ -130,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nodo('span', 'user-panel-email', u.correo),
                 nodo('span', 'user-role-badge', ETIQUETAS_ROL[u.rol] || u.rol)
             );
-            cabecera.append(nodo('div', 'user-avatar', inicial), identidad);
+            cabecera.append(crearAvatar(), identidad);
 
             const partes = [cabecera];
 
@@ -148,7 +191,16 @@ document.addEventListener('DOMContentLoaded', () => {
             partes.push(resumenReportes());
 
             const enlaces = nodo('div', 'user-panel-links');
+
+            const editar = nodo('button', 'user-panel-link user-panel-link-button', 'Editar mi perfil');
+            editar.type = 'button';
+            editar.addEventListener('click', () => {
+                cerrar(false);
+                abrirPerfil();
+            });
+
             enlaces.append(
+                editar,
                 enlace('user-panel-link', 'participacion.html#mis-aportes', 'Ver mis reportes'),
                 enlace('user-panel-link', 'participacion.html', 'Enviar un reporte')
             );
@@ -197,6 +249,38 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        // ---------- Editor de perfil (se carga solo cuando se usa) ----------
+
+        function cargarScriptPerfil() {
+            if (window.FloraPerfil) return Promise.resolve();
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = '../public/js/perfil.js';
+                script.onload = resolve;
+                script.onerror = () => reject(new Error('No se pudo cargar perfil.js'));
+                document.head.appendChild(script);
+            });
+        }
+
+        async function abrirPerfil() {
+            try {
+                await cargarScriptPerfil();
+                window.FloraPerfil.abrir({
+                    apiBase: API_BASE,
+                    usuario: estado.usuario,
+                    urlFoto,
+                    alCambiar(cambios) {
+                        Object.assign(estado.usuario, cambios);
+                        if (Object.hasOwn(cambios, 'tiene_foto')) estado.fotoVersion = Date.now();
+                        actualizarBoton();
+                        if (!panel.hidden) dibujarPanel();
+                    }
+                });
+            } catch (error) {
+                console.error('No se pudo abrir el editor de perfil:', error);
+            }
+        }
+
         // ---------- Datos ----------
 
         async function cargarSesion() {
@@ -204,6 +288,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(API_BASE + '/api/auth/me', { credentials: 'include' });
                 if (response.status === 401) {
                     estado.sesion = 'anonimo';
+                    estado.usuario = null;
                 } else if (response.ok) {
                     estado.usuario = (await response.json()).usuario;
                     estado.sesion = 'activa';
@@ -213,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 estado.sesion = 'error';
             }
-            punto.hidden = estado.sesion !== 'activa';
+            actualizarBoton();
             if (!panel.hidden) {
                 dibujarPanel();
                 if (estado.sesion === 'activa') cargarResumen();
