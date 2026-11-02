@@ -47,14 +47,58 @@ document.addEventListener('DOMContentLoaded', async () => {
             agregarDato(taxonomyBox, 'Rango altitudinal', data.rango_altitudinal || 'No especificado', '');
         }
 
-        // 4. Bloques de texto
-        const blocks = document.querySelectorAll('.info-block-card');
-        if (blocks[0]) {
-            blocks[0].querySelector('p').textContent = data.descripcion || 'Sin información registrada en la base de datos.';
+        // 4. Información botánica
+        const campos = {
+            'descripcion': data.descripcion,
+            'caracteristicas': data.caracteristicas,
+            'habitat': data.habitat,
+            'distribucion': data.distribucion,
+            'importancia-ecologica': data.importancia_ecologica,
+            'conservacion': data.conservacion
+        };
+
+        Object.entries(campos).forEach(([id, contenido]) => {
+            const elemento = document.getElementById(id);
+
+            if (elemento) {
+                elemento.textContent = contenido || 'Sin información registrada en la base de datos.';
+            }
+        });
+
+        // 5. Fuentes bibliográficas
+        const listaFuentes = document.getElementById('fuentes-bibliograficas');
+
+        if (listaFuentes) {
+            listaFuentes.replaceChildren();
+
+            if (data.fuentes && data.fuentes.length > 0) {
+                data.fuentes.forEach(fuente => {
+                    const elemento = document.createElement('li');
+
+                    const autor = fuente.autor_institucion || 'Autor no especificado';
+                    const anio = fuente.anio || 's. f.';
+
+                    elemento.textContent = `${autor} (${anio}). ${fuente.titulo || 'Título no disponible'}.`;
+
+                    if (fuente.enlace) {
+                        const enlace = document.createElement('a');
+                        enlace.href = fuente.enlace;
+                        enlace.textContent = ' Consultar fuente';
+                        enlace.target = '_blank';
+                        enlace.rel = 'noopener noreferrer';
+
+                        elemento.appendChild(enlace);
+                    }
+
+                    listaFuentes.appendChild(elemento);
+                });
+            } else {
+                const elemento = document.createElement('li');
+                elemento.textContent = 'No hay fuentes bibliográficas registradas.';
+                listaFuentes.appendChild(elemento);
+            }
         }
-        if (blocks[1]) {
-            blocks[1].querySelector('p').textContent = data.importancia_ecologica || data.distribucion || 'Sin información registrada en la base de datos.';
-        }
+
 
         // 5. Mapa
         inicializarMapa(data.ubicaciones, data.nombre_comun);
