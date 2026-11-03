@@ -25,9 +25,20 @@ const frontendOrigins = (
 ).split(',').map(origin => origin.trim()).filter(Boolean);
 
 app.use(helmet({
-    // Las fotos se sirven desde el puerto 3000 y se muestran en páginas de otro origen (5500).
-    // Con el valor por defecto de helmet, el navegador las bloquearía.
-    crossOriginResourcePolicy: { policy: 'cross-origin' }
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+
+    referrerPolicy: {
+        policy: 'strict-origin-when-cross-origin'
+    },
+
+    contentSecurityPolicy: {
+        directives: {
+            scriptSrc: ["'self'", 'https://unpkg.com'],
+            styleSrc: ["'self'", 'https://unpkg.com', 'https://fonts.googleapis.com', "'unsafe-inline'"],
+            imgSrc: ["'self'", 'data:', 'https://unpkg.com', 'https://*.tile.openstreetmap.org'],
+            connectSrc: ["'self'", 'https://unpkg.com']
+        }
+    }
 }));
 
 // CORS solo es necesario durante el desarrollo local.
