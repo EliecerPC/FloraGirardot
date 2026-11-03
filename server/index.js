@@ -18,6 +18,7 @@ if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
 }
 
 const app = express();
+app.set('trust proxy', 1);
 const PORT = Number(process.env.PORT || 3000);
 const frontendOrigins = (
     process.env.FRONTEND_URL ||
