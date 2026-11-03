@@ -19,24 +19,34 @@ if (process.env.NODE_ENV === 'production' && !process.env.SESSION_SECRET) {
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const frontendOrigins = (process.env.FRONTEND_URL || 'http://127.0.0.1:5500,http://localhost:5500')
-    .split(',').map(origin => origin.trim()).filter(Boolean);
+const frontendOrigins = (
+    process.env.FRONTEND_URL ||
+    'http://localhost:5500,http://127.0.0.1:5500,http://localhost:3000,http://127.0.0.1:3000'
+).split(',').map(origin => origin.trim()).filter(Boolean);
 
 app.use(helmet({
     // Las fotos se sirven desde el puerto 3000 y se muestran en páginas de otro origen (5500).
     // Con el valor por defecto de helmet, el navegador las bloquearía.
     crossOriginResourcePolicy: { policy: 'cross-origin' }
 }));
-app.use(cors({
-    origin(origin, callback) {
-        if (!origin || frontendOrigins.includes(origin)) return callback(null, true);
-        return callback(new Error('Origen no permitido por CORS'));
-    },
-    credentials: true
-}));
+
+// CORS solo es necesario durante el desarrollo local.
+// En producción, frontend y API comparten el mismo dominio.
+if (process.env.NODE_ENV !== 'production') {
+    app.use(cors({
+        origin: frontendOrigins,
+        credentials: true
+    }));
+}
+
 app.use(express.json({ limit: '1mb' }));
 app.use(session({
-    store: new PgSession({ pool, createTableIfMissing: true }),
+    store: new PgSession({
+        pool,
+        schemaName: 'public',
+        tableName: 'session',
+        createTableIfMissing: true
+    }),
     name: 'floragirardot.sid',
     secret: process.env.SESSION_SECRET || 'solo-desarrollo-cambiar-antes-de-publicar',
     resave: false,
@@ -53,6 +63,15 @@ app.use(session({
 app.use('/assets', express.static(path.join(__dirname, '../public/assets'), {
     setHeaders: res => res.setHeader('X-Content-Type-Options', 'nosniff')
 }));
+
+// Archivos del frontend.
+app.use('/public', express.static(path.join(__dirname, '../public')));
+app.use('/views', express.static(path.join(__dirname, '../views')));
+
+// Página principal.
+app.get('/', (_req, res) => {
+    res.redirect('/views/index.html');
+});
 
 // Las fotos de reportes van fuera de public/: solo se entregan por /api/aportes/:id/foto.
 const imageDirectory = path.join(__dirname, '../uploads/aportes');

@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    const API_BASE = 'http://' + (window.location.hostname || 'localhost') + ':3000';
+    const API_BASE = ['localhost', '127.0.0.1'].includes(window.location.hostname)
+        ? 'http://' + window.location.hostname + ':3000'
+        : '';
     const titleBadge = document.querySelector('.species-title-badge');
     const especieId = new URLSearchParams(window.location.search).get('id');
 
