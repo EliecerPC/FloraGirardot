@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data.ruta) {
                 speciesImg.src = data.ruta;
                 speciesImg.alt = data.nombre_comun;
+                speciesImg.style.display = 'block';
             } else {
                 speciesImg.style.display = 'none';
             }
