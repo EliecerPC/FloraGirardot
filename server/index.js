@@ -310,14 +310,20 @@ app.get('/api/especies', async (_req, res) => {
     }
 });
 
+
 app.get('/api/especies/:id', async (req, res) => {
     const id = req.params.id;
-    if (!/^\d+$/.test(id)) return res.status(400).json({ error: 'Identificador inválido.' });
+
+    if (!/^\d+$/.test(id)) {
+        return res.status(400).json({ error: 'Identificador inválido.' });
+    }
+
     try {
         const especieQuery = `
             SELECT e.id_especie, e.nombre_comun, e.nombre_cientifico, e.familia, e.genero,
                    ft.origen, ft.tipo_planta, ft.rango_altitudinal, ft.descripcion,
-                   ft.caracteristicas, ft.habitat, ft.distribucion, ft.importancia_ecologica, ft.conservacion,
+                   ft.caracteristicas, ft.habitat, ft.distribucion,
+                   ft.importancia_ecologica, ft.conservacion,
                    f.ruta
             FROM especie e
             LEFT JOIN ficha_tecnica ft ON ft.id_especie = e.id_especie
@@ -327,19 +333,10 @@ app.get('/api/especies/:id', async (req, res) => {
                 ORDER BY id_fotografia
                 LIMIT 1
             ) f ON TRUE
-            WHERE e.id_especie = $1 AND LOWER(e.estado) = 'activo'`;
-        const [especie, ubicaciones, fuentes] = await Promise.all([
-            pool.query(especieQuery, [id]),
-            pool.query('SELECT sector, direccion_coordenadas FROM ubicacion WHERE id_especie = $1', [id]),
-            pool.query(fuentesQuery, [id])
-        ]);
-        if (!especie.rows.length) return res.status(404).json({ error: 'Especie no encontrada.' });
-        res.json({
-            ...especie.rows[0],
-            ubicaciones: ubicaciones.rows,
-            fuentes: fuentes.rows
-        });
+            WHERE e.id_especie = $1 AND LOWER(e.estado) = 'activo'
+        `;
 
+        // Consulta de las fuentes bibliográficas
         const fuentesQuery = `
             SELECT
                 fb.id_fuente,
@@ -356,11 +353,33 @@ app.get('/api/especies/:id', async (req, res) => {
             WHERE ft.id_especie = $1
             ORDER BY fb.anio DESC NULLS LAST, fb.titulo ASC
         `;
+
+        // Ejecutar las tres consultas
+        const [especie, ubicaciones, fuentes] = await Promise.all([
+            pool.query(especieQuery, [id]),
+            pool.query(
+                'SELECT sector, direccion_coordenadas FROM ubicacion WHERE id_especie = $1',
+                [id]
+            ),
+            pool.query(fuentesQuery, [id])
+        ]);
+
+        if (!especie.rows.length) {
+            return res.status(404).json({ error: 'Especie no encontrada.' });
+        }
+
+        res.json({
+            ...especie.rows[0],
+            ubicaciones: ubicaciones.rows,
+            fuentes: fuentes.rows
+        });
+
     } catch (err) {
         console.error('Error al consultar la ficha:', err);
         res.status(500).json({ error: 'Error al consultar la ficha técnica.' });
     }
 });
+
 
 // -------------------- Cuenta del usuario --------------------
 
