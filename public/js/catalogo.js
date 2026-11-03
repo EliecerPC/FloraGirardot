@@ -25,38 +25,89 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     checkboxes.forEach(chk => chk.addEventListener('change', aplicarFiltros));
 
-    function aplicarFiltros() {
-        const textoBusqueda = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-        // Obtener los valores seleccionados de cada categoría
-        const tiposSeleccionados = Array.from(document.querySelectorAll('.filter-tipo:checked')).map(cb => cb.value.toLowerCase());
-        const origenesSeleccionados = Array.from(document.querySelectorAll('.filter-origen:checked')).map(cb => cb.value.toLowerCase());
-        const habitatsSeleccionados = Array.from(document.querySelectorAll('.filter-habitat:checked')).map(cb => cb.value.toLowerCase());
+    function aplicarFiltros() {
+        const textoBusqueda = searchInput
+            ? searchInput.value.toLowerCase().trim()
+            : '';
+
+        const tiposSeleccionados = Array.from(
+            document.querySelectorAll('.filter-tipo:checked')
+        ).map(cb => cb.value.toLowerCase());
+
+        const origenesSeleccionados = Array.from(
+            document.querySelectorAll('.filter-origen:checked')
+        ).map(cb => cb.value.toLowerCase());
+
+        const habitatsSeleccionados = Array.from(
+            document.querySelectorAll('.filter-habitat:checked')
+        ).map(cb => cb.value.toLowerCase());
 
         const especiesFiltradas = todasLasEspecies.filter(e => {
-            // 1. Filtro por texto (nombre común, científico o familia)
+            const nombreComun = (e.nombre_comun || '').toLowerCase();
+            const nombreCientifico = (e.nombre_cientifico || '').toLowerCase();
+            const familia = (e.familia || '').toLowerCase();
+
+            const tipo = (e.tipo_planta || '').toLowerCase();
+            const origen = (e.origen || '').toLowerCase();
+            const habitat = (e.habitat || '').toLowerCase();
+
+            // Búsqueda por texto
             const coincideTexto = !textoBusqueda ||
-                (e.nombre_comun && e.nombre_comun.toLowerCase().includes(textoBusqueda)) ||
-                (e.nombre_cientifico && e.nombre_cientifico.toLowerCase().includes(textoBusqueda)) ||
-                (e.familia && e.familia.toLowerCase().includes(textoBusqueda));
+                nombreComun.includes(textoBusqueda) ||
+                nombreCientifico.includes(textoBusqueda) ||
+                familia.includes(textoBusqueda);
 
-            // 2. Filtro por tipo de planta
+            // Tipo de planta
             const coincideTipo = tiposSeleccionados.length === 0 ||
-                (e.tipo_planta && tiposSeleccionados.some(t => e.tipo_planta.toLowerCase().includes(t)));
+                tiposSeleccionados.some(t => tipo.includes(t));
 
-            // 3. Filtro por origen
+            // Origen
             const coincideOrigen = origenesSeleccionados.length === 0 ||
-                (e.origen && origenesSeleccionados.some(o => e.origen.toLowerCase().includes(o)));
+                origenesSeleccionados.some(o => origen.includes(o));
 
-            // 4. Filtro por hábitat
+            // Hábitat: reconocer expresiones relacionadas
             const coincideHabitat = habitatsSeleccionados.length === 0 ||
-                (e.habitat && habitatsSeleccionados.some(h => e.habitat.toLowerCase().includes(h)));
+                habitatsSeleccionados.some(h => {
+                    const equivalencias = {
+                        'bosque seco': ['bosque seco'],
+                        'ribera': ['ribera', 'río', 'rios', 'quebrada'],
+                        'intervenido': [
+                            'zona abierta',
+                            'zonas abiertas',
+                            'intervenido',
+                            'potrero',
+                            'potreros',
+                            'borde de camino',
+                            'bordes de caminos',
+                            'paisaje rural'
+                        ],
+                        'bosque húmedo': ['bosque húmedo', 'bosques húmedos'],
+                        'urbano': [
+                            'parque',
+                            'parques',
+                            'jardín',
+                            'jardines',
+                            'avenida',
+                            'avenidas',
+                            'vía urbana',
+                            'vías urbanas'
+                        ]
+                    };
 
-            return coincideTexto && coincideTipo && coincideOrigen && coincideHabitat;
+                    return (equivalencias[h] || [h])
+                        .some(palabra => habitat.includes(palabra));
+                });
+
+            return coincideTexto &&
+                coincideTipo &&
+                coincideOrigen &&
+                coincideHabitat;
         });
 
         renderizarTarjetas(especiesFiltradas);
     }
+
 
     function crearElemento(etiqueta, clase, texto) {
         const elemento = document.createElement(etiqueta);
